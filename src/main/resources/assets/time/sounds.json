@@ -1,0 +1,12 @@
+{
+  "music.chronicle_keeper": {
+    "sounds": [
+      { "name": "time:music/chronicler_battle", "stream": true, "volume": 1.0 }
+    ]
+  },
+  "music_disc.zero_hour": {
+    "sounds": [
+      { "name": "time:music/zero_hour", "stream": true, "volume": 1.0 }
+    ]
+  }
+}

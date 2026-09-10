@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "time:chronicle_page",
+    {
+      "id": "kubejs:time_lapse_page",
+      "required": false
+    }
+  ]
+}

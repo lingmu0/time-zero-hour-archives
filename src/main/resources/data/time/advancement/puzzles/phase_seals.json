@@ -1,0 +1,23 @@
+{
+  "parent": "time:puzzles/archive_guardian",
+  "display": {
+    "icon": {
+      "id": "minecraft:clock"
+    },
+    "title": {
+      "translate": "advancement.time.phase_seals"
+    },
+    "description": {
+      "translate": "clue.time.phase_seals"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": false,
+    "hidden": false
+  },
+  "criteria": {
+    "completed": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

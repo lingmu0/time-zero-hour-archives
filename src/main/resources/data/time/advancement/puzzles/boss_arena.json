@@ -1,0 +1,23 @@
+{
+  "parent": "time:puzzles/phase_seals",
+  "display": {
+    "icon": {
+      "id": "time:epoch_core"
+    },
+    "title": {
+      "translate": "advancement.time.boss_arena"
+    },
+    "description": {
+      "translate": "clue.time.boss_arena"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "completed": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

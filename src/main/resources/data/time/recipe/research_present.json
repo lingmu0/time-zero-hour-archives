@@ -1,0 +1,17 @@
+{
+  "type": "time:research",
+  "evidence": {
+    "item": "time:present_record"
+  },
+  "catalyst": {
+    "item": "minecraft:amethyst_shard"
+  },
+  "reference": {
+    "item": "time:past_conclusion"
+  },
+  "result": {
+    "id": "time:present_conclusion",
+    "count": 1
+  },
+  "duration": 600
+}

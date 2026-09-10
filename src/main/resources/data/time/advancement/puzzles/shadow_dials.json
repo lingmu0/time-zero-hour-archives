@@ -1,0 +1,23 @@
+{
+  "parent": "time:puzzles/day_sequence",
+  "display": {
+    "icon": {
+      "id": "minecraft:clock"
+    },
+    "title": {
+      "translate": "advancement.time.shadow_dials"
+    },
+    "description": {
+      "translate": "clue.time.shadow_dials"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": false,
+    "hidden": false
+  },
+  "criteria": {
+    "completed": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

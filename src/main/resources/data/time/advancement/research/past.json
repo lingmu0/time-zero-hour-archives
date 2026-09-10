@@ -1,0 +1,32 @@
+{
+  "parent": "time:root",
+  "display": {
+    "icon": {
+      "id": "time:past_conclusion"
+    },
+    "title": {
+      "translate": "item.time.past_conclusion"
+    },
+    "description": {
+      "translate": "item.time.past_conclusion.hint"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": false,
+    "hidden": false
+  },
+  "criteria": {
+    "discovered": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "time:past_conclusion"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

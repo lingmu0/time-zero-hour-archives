@@ -1,0 +1,6 @@
+{
+  "sound_event": "time:music_disc.zero_hour",
+  "description": { "translate": "jukebox_song.time.zero_hour" },
+  "length_in_seconds": 80.0,
+  "comparator_output": 12
+}

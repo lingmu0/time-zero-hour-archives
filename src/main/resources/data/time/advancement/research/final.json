@@ -1,0 +1,32 @@
+{
+  "parent": "time:root",
+  "display": {
+    "icon": {
+      "id": "time:final_conclusion"
+    },
+    "title": {
+      "translate": "item.time.final_conclusion"
+    },
+    "description": {
+      "translate": "item.time.final_conclusion.hint"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": false,
+    "hidden": false
+  },
+  "criteria": {
+    "discovered": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "time:final_conclusion"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

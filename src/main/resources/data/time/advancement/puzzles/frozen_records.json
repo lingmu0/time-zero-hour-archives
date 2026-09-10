@@ -1,0 +1,23 @@
+{
+  "parent": "time:puzzles/shadow_dials",
+  "display": {
+    "icon": {
+      "id": "minecraft:clock"
+    },
+    "title": {
+      "translate": "advancement.time.frozen_records"
+    },
+    "description": {
+      "translate": "clue.time.frozen_records"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": false,
+    "hidden": false
+  },
+  "criteria": {
+    "completed": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "time:archive_probe"
+    },
+    {
+      "item": "time:present_conclusion"
+    },
+    {
+      "item": "minecraft:diamond"
+    }
+  ],
+  "result": {
+    "id": "time:zero_probe",
+    "count": 1
+  }
+}

@@ -1,0 +1,70 @@
+plugins {
+    id 'java-library'
+    id 'net.neoforged.moddev' version '2.0.144'
+}
+version = mod_version
+group = mod_group_id
+base { archivesName = mod_id }
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(21)
+    withSourcesJar()
+}
+repositories { mavenCentral() }
+sourceSets { validation }
+configurations {
+    validationImplementation.extendsFrom implementation
+    validationRuntimeOnly.extendsFrom runtimeOnly
+}
+dependencies { validationImplementation sourceSets.main.output }
+neoForge {
+    version = project.neo_version
+    addModdingDependenciesTo sourceSets.validation
+    mods {
+        "${mod_id}" { sourceSet(sourceSets.main) }
+        time_validation { sourceSet(sourceSets.validation) }
+    }
+    // Use 1.21.1 official mappings; the source template's Parchment version targets 1.21.11.
+    runs {
+        client { client(); loadedMods = [mods.time] }
+        server { server(); programArgument '--nogui'; loadedMods = [mods.time] }
+        validationServer {
+            type = 'gameTestServer'
+            gameDirectory = project.file('run-validation-server')
+            sourceSet = sourceSets.validation
+            systemProperty 'neoforge.enabledGameTestNamespaces', 'time_validation'
+            systemProperty 'neoforge.gameTestServer', 'true'
+            programArguments.addAll '--world', 'time-gametest-' + System.currentTimeMillis()
+        }
+        validationClient {
+            client()
+            gameDirectory = project.file('run-validation-client')
+            sourceSet = sourceSets.validation
+            systemProperty 'time.validation.visual', 'true'
+            programArguments.addAll '--width', '1280', '--height', '800'
+        }
+        combatClient {
+            client()
+            gameDirectory = project.file('run-validation-combat')
+            sourceSet = sourceSets.validation
+            systemProperty 'time.validation.combat', 'true'
+            programArguments.addAll '--width', '1280', '--height', '800'
+        }
+    }
+}
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release = 21
+}
+processResources {
+    inputs.property 'mod_version', project.mod_version
+    filesMatching('META-INF/neoforge.mods.toml') {
+        expand mod_version: project.mod_version
+    }
+}
+tasks.register('stateTest', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'net.xuwu.time.logic.StateTests'
+    enableAssertions = true
+}
+check.dependsOn stateTest

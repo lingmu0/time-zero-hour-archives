@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "time:past_conclusion"
+    },
+    {
+      "item": "time:present_conclusion"
+    },
+    {
+      "item": "time:blank_seal"
+    },
+    {
+      "item": "minecraft:diamond"
+    },
+    {
+      "item": "minecraft:gold_ingot"
+    }
+  ],
+  "result": {
+    "id": "time:zero_key",
+    "count": 1
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "structures": [
+    {
+      "structure": "time:clockroom",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 40,
+    "separation": 16,
+    "salt": 47304457
+  }
+}

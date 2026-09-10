@@ -1,0 +1,32 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import assert from 'node:assert/strict';
+import {fileURLToPath} from 'node:url';
+const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
+const sinceArg=process.argv.slice(2).find(a=>a.startsWith('--since='));
+const since=sinceArg?Date.parse(sinceArg.slice(8)):0;
+assert(Number.isFinite(since),'Invalid since timestamp');
+const report=JSON.parse(fs.readFileSync(path.join(root,'build/reports/combat-visual.json'),'utf8'));
+assert.equal(report.status,'passed',JSON.stringify(report));
+assert.equal(report.version,'0.1.16');
+assert(Date.parse(report.generated_at)>=since,'Stale combat report');
+const files=['01-shield-north','02-shield-east','03-bolt-windup','04-bolt-release','05-ring-warning','06-ring-impact','07-ring-cleared','08-present-no-zone-overlay','09-stasis-fx-fixture','10-future-hit-fx-fixture','11-future-debt-hit','12-fake-bolt-windup','13-fake-ring-warning','14-paradox-swap'];
+assert.equal(report.captures.length,files.length);
+for(const [i,name] of files.entries()){
+  const shot=report.captures[i];assert.equal(shot.file,name+'.png');
+  const file=path.join(root,'run-validation-combat/screenshots',shot.file);
+  assert(fs.statSync(file).mtimeMs>=since,'Stale screenshot '+name);
+  assert.equal(fs.readFileSync(file).subarray(0,8).toString('hex'),'89504e470d0a1a0a');
+}
+const shots=report.captures;
+assert(shots.slice(0,2).every(s=>s.shield && s.facing_error_degrees<8),'Shield facing failed');
+assert(!shots[2].shield && shots[2].cast===1 && shots[2].cast_age<10,'Missing bolt anticipation');
+assert(shots[3].cast===1 && shots[3].cast_age>=10,'Missing bolt release');
+assert(shots[4].ring_remaining>0 && shots[5].ring_remaining<=0,'Missing ring warning/impact');
+assert(shots[6].ring_remaining<-10 && shots[7].phase===2,'Missing clear/present scene');
+assert(shots.every(s=>s.ring_inner===4&&s.ring_outer===10),'Ring radius mismatch');
+assert(shots[10].phase===3&&shots[10].actual_debt_damage>0&&shots[10].debt_hit_age<=10,'Real debt damage and timely hit capture required');
+assert(shots[11].phase===4&&!shots[11].shield&&shots[11].fake_cast===1,'Fake cast or final shield failed');
+assert(shots[12].fake_ring_remaining>0&&shots[12].fake_cast===2,'Fake ring missing');
+assert(shots[13].swap_active,'Both bodies must show swap effects');
+console.log('PASS: 14 combat captures including real future-debt damage and two deterministic hit-VFX fixtures ('+report.generated_at+').');

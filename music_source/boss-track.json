@@ -1,0 +1,19 @@
+{
+  "title": "漆黒の代償 / 漆黑的代价",
+  "asset": "src/main/resources/assets/time/sounds/music/chronicler_battle.ogg",
+  "source_filename": "【免费BGM】漆黑的代价【战斗・最终Boss・悲怆感・绝望】 - 1.【フリーBGM】漆黒の代償【戦闘・ラスボス・悲愴感・ダークシリアス・絶望・壮(Av114998437219867,P1).mp3",
+  "source_sha256": "356538e23e293168e2c65f58a5f32d79ac5ebf67f210c2101007651b8a7ae23c",
+  "source_reference": "https://www.youtube.com/watch?v=ZrgrrObNZFo",
+  "source_reference_verified": false,
+  "license_status": "unverified-user-supplied",
+  "author": "Not verified",
+  "sha256": "9404337b17ca9be5918aa93ac9f63cd868ccdf0255622407acb85618f5bcca23",
+  "sample_rate": 44100,
+  "channels": 2,
+  "frames": 9035776,
+  "duration_seconds": 204.8928798185941,
+  "source_peak_dbfs": 2.089540853872759,
+  "gain_db": -5.589540853872759,
+  "edge_fade_seconds": 0.01,
+  "processing": "Complete track; gain reduction; 10 ms edge fades; Ogg Vorbis encoding. Natural ending retained, not a beat-matched seamless loop."
+}

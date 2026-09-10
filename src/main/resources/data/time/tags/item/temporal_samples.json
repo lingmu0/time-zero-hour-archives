@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "time:temporal_dust",
+    {
+      "id": "kubejs:time_residue",
+      "required": false
+    }
+  ]
+}

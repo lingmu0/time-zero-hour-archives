@@ -1,0 +1,17 @@
+{
+  "type": "time:research",
+  "evidence": {
+    "item": "time:future_record"
+  },
+  "catalyst": {
+    "tag": "time:chronicle_pages"
+  },
+  "reference": {
+    "item": "time:epoch_core"
+  },
+  "result": {
+    "id": "time:final_conclusion",
+    "count": 1
+  },
+  "duration": 800
+}

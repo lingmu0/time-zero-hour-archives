@@ -1,0 +1,18 @@
+{
+  "type": "time:research",
+  "evidence": {
+    "item": "time:past_record"
+  },
+  "catalyst": {
+    "tag": "time:temporal_samples"
+  },
+  "reference": {
+    "item": "minecraft:book"
+  },
+  "result": {
+    "id": "time:past_conclusion",
+    "count": 1
+  },
+  "duration": 400,
+  "consume_reference": true
+}

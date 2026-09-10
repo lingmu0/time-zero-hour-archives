@@ -1,0 +1,15 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_page": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": { "items": [{ "items": "time:chronicle_page" }] }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": { "recipe": "time:music_disc_zero_hour" }
+    }
+  },
+  "requirements": [["has_page", "has_the_recipe"]],
+  "rewards": { "recipes": ["time:music_disc_zero_hour"] }
+}

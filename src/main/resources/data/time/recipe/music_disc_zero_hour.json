@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    { "item": "minecraft:obsidian" },
+    { "item": "minecraft:amethyst_shard" },
+    { "item": "time:chronicle_page" },
+    { "item": "time:temporal_dust" }
+  ],
+  "result": { "id": "time:music_disc_zero_hour", "count": 1 }
+}
