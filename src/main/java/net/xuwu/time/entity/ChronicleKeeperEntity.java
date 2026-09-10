@@ -72,7 +72,8 @@ public final class ChronicleKeeperEntity extends Monster implements ChronalCaste
     }
     @Override protected void registerGoals() { /* Encounter owns target selection. */ }
     @Override protected float tickHeadTurn(float movementYaw, float limbAmount) {
-        yBodyRot = getYRot(); // Face the target, not the sideways hover velocity.
+        yBodyRot = getYRot();
+        yHeadRot = getYRot(); // The whole rig tracks the target; never leave a stale head yaw.
         return limbAmount;
     }
     @Override public void lerpTo(double x, double y, double z, float yaw, float pitch, int steps, boolean teleport) {
