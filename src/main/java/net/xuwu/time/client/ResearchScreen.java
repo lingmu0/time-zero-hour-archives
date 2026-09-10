@@ -7,9 +7,9 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.xuwu.time.research.ResearchMenu;
 
+/** Uses the 1.20.1 vanilla furnace texture directly for a native-looking research UI. */
 public final class ResearchScreen extends AbstractContainerScreen<ResearchMenu> {
-    private static final ResourceLocation PANEL = ResourceLocation.withDefaultNamespace("textures/gui/container/furnace.png");
-    private static final ResourceLocation PROGRESS = ResourceLocation.withDefaultNamespace("container/furnace/burn_progress");
+    private static final ResourceLocation PANEL = new ResourceLocation("textures/gui/container/furnace.png");
 
     public ResearchScreen(ResearchMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
@@ -18,11 +18,8 @@ public final class ResearchScreen extends AbstractContainerScreen<ResearchMenu> 
     }
     @Override protected void renderBg(GuiGraphics g, float partial, int mouseX, int mouseY) {
         int x = leftPos, y = topPos;
-        // Reuse vanilla pixels instead of shipping a recoloured copy of the UI.
         g.blit(PANEL, x, y, 0, 0, imageWidth, imageHeight);
-        for (int row = 16; row < 72; row += 8) {
-            g.blit(PANEL, x + 4, y + row, 4, 4, 168, 8);
-        }
+        for (int row = 16; row < 72; row += 8) g.blit(PANEL, x + 4, y + row, 4, 4, 168, 8);
         for (int i = 0; i < 3; i++) {
             var slot = menu.getSlot(i);
             g.blit(PANEL, x + slot.x - 1, y + slot.y - 1, 55, 16, 18, 18);
@@ -30,7 +27,8 @@ public final class ResearchScreen extends AbstractContainerScreen<ResearchMenu> 
         var output = menu.getSlot(3);
         g.blit(PANEL, x + output.x - 5, y + output.y - 5, 111, 30, 26, 26);
         g.blit(PANEL, x + 110, y + 35, 79, 34, 24, 16);
-        g.blitSprite(PROGRESS, 24, 16, 0, 0, x + 110, y + 35, menu.progressPixels(24), 16);
+        int progress = menu.progressPixels(24);
+        if (progress > 0) g.blit(PANEL, x + 110, y + 35, 79, 34, progress, 16);
     }
     @Override protected void renderLabels(GuiGraphics g, int mouseX, int mouseY) {
         super.renderLabels(g, mouseX, mouseY);
@@ -44,8 +42,6 @@ public final class ResearchScreen extends AbstractContainerScreen<ResearchMenu> 
     @Override public void render(GuiGraphics g, int mouseX, int mouseY, float partial) {
         super.render(g, mouseX, mouseY, partial);
         renderTooltip(g, mouseX, mouseY);
-        if (isHovering(8, 58, 160, 12, mouseX, mouseY)) {
-            g.renderTooltip(font, Component.translatable("menu.time.note"), mouseX, mouseY);
-        }
+        if (isHovering(8, 58, 160, 12, mouseX, mouseY)) g.renderTooltip(font, Component.translatable("menu.time.note"), mouseX, mouseY);
     }
 }

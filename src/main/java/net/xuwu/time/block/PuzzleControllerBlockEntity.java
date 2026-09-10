@@ -18,7 +18,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.neoforge.common.NeoForge;
+import net.minecraftforge.common.MinecraftForge;
 import net.xuwu.time.*;
 import net.xuwu.time.api.*;
 import net.xuwu.time.entity.*;
@@ -221,14 +221,14 @@ public final class PuzzleControllerBlockEntity extends BlockEntity {
     public void claim(ServerPlayer player) {
         if (!state.solved() || !claimed.add(player.getUUID())) { message(player, state.solved() ? "claimed" : "unsolved"); return; }
         switch (kind) {
-            case FROZEN_RECORDS -> { give(player, TimeContent.PAST_RECORD.toStack()); give(player, TimeContent.PAST_SEAL.toStack()); give(player, TimeContent.CHRONICLE_PAGE.toStack()); }
-            case ARCHIVE_GUARDIAN -> { give(player, TimeContent.PRESENT_RECORD.toStack()); give(player, TimeContent.PRESENT_SEAL.toStack()); give(player, TimeContent.CHRONICLE_PAGE.toStack()); }
-            case BOSS_ARENA -> { give(player, TimeContent.EPOCH_CORE.toStack()); give(player, TimeContent.FUTURE_RECORD.toStack()); give(player, new ItemStack(TimeContent.CHRONICLE_PAGE.get(), 2)); }
+            case FROZEN_RECORDS -> { give(player, new ItemStack(TimeContent.PAST_RECORD.get())); give(player, new ItemStack(TimeContent.PAST_SEAL.get())); give(player, new ItemStack(TimeContent.CHRONICLE_PAGE.get())); }
+            case ARCHIVE_GUARDIAN -> { give(player, new ItemStack(TimeContent.PRESENT_RECORD.get())); give(player, new ItemStack(TimeContent.PRESENT_SEAL.get())); give(player, new ItemStack(TimeContent.CHRONICLE_PAGE.get())); }
+            case BOSS_ARENA -> { give(player, new ItemStack(TimeContent.EPOCH_CORE.get())); give(player, new ItemStack(TimeContent.FUTURE_RECORD.get())); give(player, new ItemStack(TimeContent.CHRONICLE_PAGE.get(), 2)); }
             default -> {}
         }
         player.giveExperiencePoints(kind == PuzzleKind.BOSS_ARENA ? 300 : 20);
         TimeProgress.award(player, "puzzles/" + kind.key());
-        NeoForge.EVENT_BUS.post(new PuzzleSolvedEvent(player, getBlockPos(), kind));
+        MinecraftForge.EVENT_BUS.post(new PuzzleSolvedEvent(player, getBlockPos(), kind));
         message(player, "solved"); setChanged();
     }
     private static void give(ServerPlayer player, ItemStack stack) { if (!player.getInventory().add(stack)) player.drop(stack, false); }
@@ -308,8 +308,8 @@ public final class PuzzleControllerBlockEntity extends BlockEntity {
         }
     }
 
-    @Override protected void saveAdditional(CompoundTag tag, HolderLookup.Provider lookup) {
-        super.saveAdditional(tag, lookup);
+    @Override protected void saveAdditional(CompoundTag tag) {
+        super.saveAdditional(tag);
         tag.putBoolean("Configured", configured); tag.putInt("Kind", kind.ordinal());
         tag.putBoolean("Solved", state.solved()); tag.putInt("Progress", state.progress()); tag.putIntArray("Dials", state.dials()); tag.putLong("Cooldown", state.cooldownUntil());
         tag.putLong("Min", min.asLong()); tag.putLong("Max", max.asLong()); tag.putLong("Spawn", spawn.asLong());
@@ -319,8 +319,8 @@ public final class PuzzleControllerBlockEntity extends BlockEntity {
         if (encounter != null) tag.putUUID("Encounter", encounter);
         tag.putBoolean("Paid", paid); tag.putLong("RetryAt", retryAt);
     }
-    @Override protected void loadAdditional(CompoundTag tag, HolderLookup.Provider lookup) {
-        super.loadAdditional(tag, lookup);
+    @Override public void load(CompoundTag tag) {
+        super.load(tag);
         configured = tag.getBoolean("Configured"); kind = PuzzleKind.safe(tag.getInt("Kind"));
         state.restore(tag.getInt("Progress"), tag.getIntArray("Dials"), tag.getBoolean("Solved"), tag.getLong("Cooldown"));
         if (kind == PuzzleKind.DELAY_BELLS) state.clearRhythm();

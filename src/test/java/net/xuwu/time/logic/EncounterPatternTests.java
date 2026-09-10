@@ -35,7 +35,7 @@ public final class EncounterPatternTests {
             check(p.polygons().equals(same.polygons()),"client/server deterministic geometry");
             if(kind==2){
                 check(p.circles().size()==ArenaPattern.CIRCLE_COUNT,"twenty dense circles");
-                check(p.circles().getFirst().x()==110.5&&p.circles().getFirst().z()==217.25&&p.danger(110.5,217.25),"one fixed target-foot circle");
+                check(p.circles().get(0).x()==110.5&&p.circles().get(0).z()==217.25&&p.danger(110.5,217.25),"one fixed target-foot circle");
                 for(int a=0;a<p.circles().size();a++)for(int b=0;b<a;b++)
                     check(Math.hypot(p.circles().get(a).x()-p.circles().get(b).x(),p.circles().get(a).z()-p.circles().get(b).z())>ArenaPattern.CIRCLE_MIN_SEPARATION,
                         "dense circles keep their minimum center separation");

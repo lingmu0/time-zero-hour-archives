@@ -32,7 +32,4 @@ public final class TemporalEchoRenderer extends MobRenderer<TemporalEchoEntity, 
         float scale = entity.mode() == TemporalEchoEntity.PARADOX ? 1 : .60f;
         pose.scale(scale, scale, scale);
     }
-    @Override protected float getShadowRadius(TemporalEchoEntity entity) {
-        return (entity.mode() == TemporalEchoEntity.PARADOX ? .85f : .42f) * entity.getAgeScale();
-    }
 }

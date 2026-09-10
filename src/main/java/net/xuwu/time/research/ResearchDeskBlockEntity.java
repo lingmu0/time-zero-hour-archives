@@ -29,12 +29,12 @@ public final class ResearchDeskBlockEntity extends BlockEntity implements Contai
             if (desk.progress != 0) { desk.progress = 0; desk.activeRecipe = ""; desk.setChanged(); }
             return;
         }
-        var holder = match.get();
-        var recipe = holder.value();
-        if (!desk.activeRecipe.equals(holder.id().toString())) { desk.progress = 0; desk.activeRecipe = holder.id().toString(); }
+        var recipe = match.get();
+        String recipeKey = recipe.toString();
+        if (!desk.activeRecipe.equals(recipeKey)) { desk.progress = 0; desk.activeRecipe = recipeKey; }
         desk.duration = recipe.duration();
         ItemStack output = recipe.assemble(input, level.registryAccess()), existing = desk.items.get(3);
-        if (!existing.isEmpty() && (!ItemStack.isSameItemSameComponents(existing, output) || existing.getCount() + output.getCount() > existing.getMaxStackSize())) return;
+        if (!existing.isEmpty() && (!ItemStack.isSameItemSameTags(existing, output) || existing.getCount() + output.getCount() > existing.getMaxStackSize())) return;
         if (++desk.progress >= desk.duration) {
             if (recipe.consumeEvidence()) desk.consume(0);
             desk.consume(1);
@@ -62,18 +62,18 @@ public final class ResearchDeskBlockEntity extends BlockEntity implements Contai
         return result;
     }
     @Override public ItemStack removeItemNoUpdate(int slot) { return ContainerHelper.takeItem(items, slot); }
-    @Override public void setItem(int slot, ItemStack stack) { items.set(slot, stack); stack.limitSize(getMaxStackSize(stack)); setChanged(); }
+    @Override public void setItem(int slot, ItemStack stack) { items.set(slot, stack); stack.setCount(Math.min(stack.getCount(), getMaxStackSize())); setChanged(); }
     @Override public boolean canPlaceItem(int slot, ItemStack stack) { return slot != 3; }
     @Override public boolean stillValid(Player player) { return Container.stillValidBlockEntity(this, player); }
     @Override public void clearContent() { items.clear(); setChanged(); }
     @Override public Component getDisplayName() { return Component.translatable("block.time.research_desk"); }
     @Override public AbstractContainerMenu createMenu(int id, Inventory inventory, Player player) { return new ResearchMenu(id, inventory, this, data); }
-    @Override protected void saveAdditional(CompoundTag tag, HolderLookup.Provider lookup) {
-        super.saveAdditional(tag, lookup); ContainerHelper.saveAllItems(tag, items, lookup);
+    @Override protected void saveAdditional(CompoundTag tag) {
+        super.saveAdditional(tag); ContainerHelper.saveAllItems(tag, items);
         tag.putInt("Progress", progress); tag.putInt("Duration", duration); tag.putString("Recipe", activeRecipe);
     }
-    @Override protected void loadAdditional(CompoundTag tag, HolderLookup.Provider lookup) {
-        super.loadAdditional(tag, lookup); ContainerHelper.loadAllItems(tag, items, lookup);
+    @Override public void load(CompoundTag tag) {
+        super.load(tag); ContainerHelper.loadAllItems(tag, items);
         progress = Math.max(0, tag.getInt("Progress")); duration = Math.max(1, tag.getInt("Duration")); activeRecipe = tag.getString("Recipe");
     }
 }

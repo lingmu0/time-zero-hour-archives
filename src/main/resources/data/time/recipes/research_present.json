@@ -10,7 +10,7 @@
     "item": "time:past_conclusion"
   },
   "result": {
-    "id": "time:present_conclusion",
+    "item": "time:present_conclusion",
     "count": 1
   },
   "duration": 600

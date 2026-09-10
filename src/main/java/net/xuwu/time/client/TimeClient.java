@@ -1,13 +1,15 @@
 package net.xuwu.time.client;
 
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.*;
+import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.EntityRenderersEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.xuwu.time.TimeMod;
 import net.xuwu.time.registry.TimeContent;
 
-@EventBusSubscriber(modid = TimeMod.ID, value = Dist.CLIENT)
+@Mod.EventBusSubscriber(modid = TimeMod.ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public final class TimeClient {
     @SubscribeEvent public static void renderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(TimeContent.CHRONICLE_KEEPER.get(), KeeperRenderer::new);
@@ -20,6 +22,6 @@ public final class TimeClient {
         event.registerLayerDefinition(KeeperModel.LAYER, KeeperGeometry::createLayer);
         event.registerLayerDefinition(ChronalBoltRenderer.LAYER, ChronalBoltGeometry::createLayer);
     }
-    @SubscribeEvent public static void screens(RegisterMenuScreensEvent event) { event.register(TimeContent.RESEARCH_MENU.get(), ResearchScreen::new); }
+    @SubscribeEvent public static void screens(FMLClientSetupEvent event) { event.enqueueWork(() -> MenuScreens.register(TimeContent.RESEARCH_MENU.get(), ResearchScreen::new)); }
     private TimeClient() {}
 }

@@ -63,22 +63,23 @@ public final class ChronicleKeeperEntity extends Monster implements ChronalCaste
         return Monster.createMonsterAttributes().add(Attributes.MAX_HEALTH, 900).add(Attributes.ATTACK_DAMAGE, 10)
             .add(Attributes.ARMOR, 10).add(Attributes.KNOCKBACK_RESISTANCE, 1).add(Attributes.MOVEMENT_SPEED, .20).add(Attributes.FOLLOW_RANGE, 48);
     }
-    @Override protected void defineSynchedData(SynchedEntityData.Builder builder) {
-        super.defineSynchedData(builder); builder.define(PHASE, 0); builder.define(SHIELD, true); builder.define(SAFE, 0);
-        builder.define(ARENA_MIN, BlockPos.ZERO); builder.define(ARENA_MAX, BlockPos.ZERO); builder.define(ORIGIN, BlockPos.ZERO);
-        builder.define(RING_AT, -1L); builder.define(CAST_AT, -1L); builder.define(CAST, 0); builder.define(SWAP_AT, -1L);
-        builder.define(RING_PATTERN, new CompoundTag());
+    @Override protected void defineSynchedData() {
+        super.defineSynchedData();
+        entityData.define(PHASE, 0); entityData.define(SHIELD, true); entityData.define(SAFE, 0);
+        entityData.define(ARENA_MIN, BlockPos.ZERO); entityData.define(ARENA_MAX, BlockPos.ZERO); entityData.define(ORIGIN, BlockPos.ZERO);
+        entityData.define(RING_AT, -1L); entityData.define(CAST_AT, -1L); entityData.define(CAST, 0); entityData.define(SWAP_AT, -1L);
+        entityData.define(RING_PATTERN, new CompoundTag());
     }
     @Override protected void registerGoals() { /* Encounter owns target selection. */ }
     @Override protected float tickHeadTurn(float movementYaw, float limbAmount) {
         yBodyRot = getYRot(); // Face the target, not the sideways hover velocity.
         return limbAmount;
     }
-    @Override public void lerpTo(double x, double y, double z, float yaw, float pitch, int steps) {
+    @Override public void lerpTo(double x, double y, double z, float yaw, float pitch, int steps, boolean teleport) {
         // Vanilla teleport packets still request three interpolation ticks. Do not slide
         // the body or its obscuration cylinder across the arena during a paradox swap.
         boolean snap = level().isClientSide && phase() == 4 && (swapping() || distanceToSqr(x, y, z) > 4);
-        super.lerpTo(x, y, z, yaw, pitch, snap ? 0 : steps);
+        super.lerpTo(x, y, z, yaw, pitch, snap ? 0 : steps, snap || teleport);
         if (snap) {
             setPos(x, y, z); setYRot(yaw); setXRot(pitch);
             setDeltaMovement(Vec3.ZERO); setOldPosAndRot();
@@ -233,9 +234,9 @@ public final class ChronicleKeeperEntity extends Monster implements ChronalCaste
         setDeltaMovement(hoverTarget.subtract(position()).scale(.055));
         var targets = allPlayers.stream().filter(p -> !p.isCreative()).toList();
         if (phase() == 4 && !shielded() && !targets.isEmpty()) tickParadox(server);
-        if (swapping()) { setDeltaMovement(Vec3.ZERO); faceTarget(allPlayers.getFirst()); return; }
+        if (swapping()) { setDeltaMovement(Vec3.ZERO); faceTarget(allPlayers.get(0)); return; }
         if (targets.isEmpty()) {
-            faceTarget(allPlayers.getFirst()); // Creative inspection still has correct facing.
+            faceTarget(allPlayers.get(0)); // Creative inspection still has correct facing.
             clearCombatVisuals(); // Never resume an expired strike after a target changes mode.
         }
         if (!targets.isEmpty()) {
@@ -270,7 +271,7 @@ public final class ChronicleKeeperEntity extends Monster implements ChronalCaste
             if (ringImpactTime() >= 0 && now >= ringImpactTime() && !ringResolved) {
                 ringResolved = true;
                 RingAttacks.resolve(this, targets, (float)getAttributeValue(Attributes.ATTACK_DAMAGE));
-                level().playSound(null, blockPosition(), SoundEvents.TRIDENT_THUNDER.value(), SoundSource.HOSTILE, .7f, 1.5f);
+                level().playSound(null, blockPosition(), SoundEvents.TRIDENT_THUNDER, SoundSource.HOSTILE, .7f, 1.5f);
             }
             if (castAge(0) >= castDuration()) { entityData.set(CAST, 0); castTarget = null; }
         }
@@ -343,7 +344,7 @@ public final class ChronicleKeeperEntity extends Monster implements ChronalCaste
         }
         if (phaseTicks % 20 == 0) {
             if (phaseTicks % 120 > 30) for (var player : targets) if (quadrant(player) != safeQuadrant()) {
-                player.addEffect(new net.minecraft.world.effect.MobEffectInstance(TimeContent.STASIS, 30, 0));
+                player.addEffect(new net.minecraft.world.effect.MobEffectInstance(TimeContent.STASIS.get(), 30, 0));
                 ChronalEffects.stasis(player);
             }
         }
@@ -383,7 +384,7 @@ public final class ChronicleKeeperEntity extends Monster implements ChronalCaste
     private void tickParadox(ServerLevel server) {
         var echoes = server.getEntitiesOfClass(TemporalEchoEntity.class, bounds().inflate(4), e -> e.isAlive() && e.mode() == TemporalEchoEntity.PARADOX && e.ownedBy(getUUID()));
         if (echoes.isEmpty()) return;
-        var echo = echoes.getFirst();
+        var echo = echoes.get(0);
         if (swapping()) {
             if (!swapResolved && server.getGameTime() - swapStartedAt() >= 12) {
                 swapResolved = true;

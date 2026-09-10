@@ -12,7 +12,7 @@ import net.minecraft.ChatFormatting;
 public final class ArchiveItem extends Item {
     private final String key;
     public ArchiveItem(Properties properties, String key) { super(properties); this.key = key; }
-    @Override public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> lines, TooltipFlag flag) {
+    @Override public void appendHoverText(ItemStack stack, Level level, List<Component> lines, TooltipFlag flag) {
         lines.add(Component.translatable("item.time." + key + ".hint").withStyle(ChatFormatting.GRAY));
     }
     @Override public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {

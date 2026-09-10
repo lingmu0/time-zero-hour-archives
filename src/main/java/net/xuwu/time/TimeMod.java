@@ -1,25 +1,28 @@
 package net.xuwu.time;
 
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.ModContainer;
-import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.config.ModConfig;
-import net.neoforged.neoforge.common.NeoForge;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.EventPriority;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.ModLoadingContext;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.xuwu.time.registry.TimeContent;
 
 @Mod(TimeMod.ID)
 public final class TimeMod {
     public static final String ID = "time";
 
-    public TimeMod(IEventBus bus, ModContainer container) {
+    public TimeMod() {
+        IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
         TimeContent.register(bus);
-        container.registerConfig(ModConfig.Type.COMMON, TimeConfig.SPEC);
-        NeoForge.EVENT_BUS.addListener(TimeCommands::register);
-        NeoForge.EVENT_BUS.addListener(net.neoforged.bus.api.EventPriority.LOWEST, net.xuwu.time.entity.TimeCombatEvents::onDamage);
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, TimeConfig.SPEC);
+        MinecraftForge.EVENT_BUS.addListener(TimeCommands::register);
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.LOWEST, net.xuwu.time.entity.TimeCombatEvents::onDamage);
     }
 
     public static ResourceLocation id(String path) {
-        return ResourceLocation.fromNamespaceAndPath(ID, path);
+        return new ResourceLocation(ID, path);
     }
 }

@@ -21,7 +21,7 @@
     }
   },
   "result": {
-    "id": "time:time_probe",
+    "item": "time:time_probe",
     "count": 1
   }
 }

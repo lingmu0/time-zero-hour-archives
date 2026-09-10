@@ -24,7 +24,8 @@ public final class ChronalModel<T extends LivingEntity> extends EntityModel<T> {
         pendulum.zRot = (float)Math.sin(age * .08f) * .3f;
         arms.xRot = -.08f + (float)Math.sin(age * .05f) * .08f;
     }
-    @Override public void renderToBuffer(PoseStack pose, VertexConsumer buffer, int light, int overlay, int color) {
-        root.render(pose, buffer, light, overlay, color);
+    @Override public void renderToBuffer(PoseStack pose, VertexConsumer buffer, int light, int overlay,
+            float red, float green, float blue, float alpha) {
+        root.render(pose, buffer, light, overlay);
     }
 }

@@ -4,6 +4,9 @@ import assert from 'node:assert/strict';
 import {fileURLToPath} from 'node:url';
 import {exportGeometry,modelExports} from './export-bbmodel.mjs';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..'),res=path.join(root,'src/main/resources');
+const forge=fs.existsSync(path.join(res,'META-INF/mods.toml'));
+const advancementDir=forge?'advancements':'advancement';
+const recipeDir=forge?'recipes':'recipe';
 const all=[];
 function walk(dir){for(const entry of fs.readdirSync(dir,{withFileTypes:true})){const p=path.join(dir,entry.name);entry.isDirectory()?walk(p):all.push(p);}}
 walk(res);
@@ -24,7 +27,10 @@ assert(keeperSource.includes('Component.translatable("present_phase.time." + saf
 assert(keeperSource.includes('Component.translatable("present_phase.time." + q)'),'Future debt prompt must use direction plus phase');
 for (const name of ['ChronicleKeeperEntity','TemporalEchoEntity']) {
   const java=fs.readFileSync(path.join(root,'src/main/java/net/xuwu/time/entity/'+name+'.java'),'utf8');
-  assert(java.includes('super.lerpTo(x, y, z, yaw, pitch, snap ? 0 : steps)')&&java.includes('setDeltaMovement(Vec3.ZERO); setOldPosAndRot();'),'Swap must reset interpolation and frame history: '+name);
+  const interpolation=forge
+    ? java.includes('super.lerpTo(x, y, z, yaw, pitch, snap ? 0 : steps, snap || teleport)')
+    : java.includes('super.lerpTo(x, y, z, yaw, pitch, snap ? 0 : steps)');
+  assert(interpolation&&java.includes('setDeltaMovement(Vec3.ZERO); setOldPosAndRot();'),'Swap must reset interpolation and frame history: '+name);
 }
 let refs=0;
 function exists(p){assert(fs.existsSync(path.join(res,p)),'Missing resource: '+p);refs++;}
@@ -47,8 +53,9 @@ function validateTree(value,filename){
 }
 for(const [filename,doc] of docs){
   validateTree(doc,filename);
-  if(filename.startsWith('data/time/recipe/')){
+  if(filename.startsWith('data/time/'+recipeDir+'/')){
     if(doc.result?.id)item(doc.result.id);
+    if(doc.result?.item)item(doc.result.item);
     if(doc.type==='time:research'){
       for(const key of ['evidence','catalyst','reference','result'])assert(doc[key],filename+' lacks '+key);
       assert(doc.duration>0&&doc.duration<=72000,'Invalid research duration');
@@ -79,7 +86,7 @@ for(const id of items){
 const kinds=['day_sequence','shadow_dials','frozen_records','archive_order','mirror_path','delay_bells','archive_guardian','phase_seals','boss_arena'];
 for(const kind of kinds){
   assert('clue.time.'+kind in zh,'Missing in-world clue '+kind);
-  exists('data/time/advancement/puzzles/'+kind+'.json');
+  exists('data/time/'+advancementDir+'/puzzles/'+kind+'.json');
 }
 const counts={day_sequence:4,shadow_dials:4,frozen_records:1,archive_order:6,mirror_path:6,delay_bells:3,phase_seals:3,boss_arena:5};
 for(const [kind,count] of Object.entries(counts))for(let i=0;i<count;i++)assert('node.time.'+kind+'.'+i in zh,'Missing node clue '+kind+' '+i);

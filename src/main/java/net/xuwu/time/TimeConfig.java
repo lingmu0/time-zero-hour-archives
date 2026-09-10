@@ -1,18 +1,18 @@
 package net.xuwu.time;
 
-import net.neoforged.neoforge.common.ModConfigSpec;
+import net.minecraftforge.common.ForgeConfigSpec;
 
 public final class TimeConfig {
-    public static final ModConfigSpec SPEC;
-    public static final ModConfigSpec.DoubleValue BOSS_HEALTH;
-    public static final ModConfigSpec.DoubleValue BOSS_DAMAGE;
-    public static final ModConfigSpec.IntValue ECHO_COUNT;
-    public static final ModConfigSpec.DoubleValue ECHO_HEALTH;
-    public static final ModConfigSpec.IntValue RETRY_DELAY;
-    public static final ModConfigSpec.IntValue LOCATOR_RADIUS;
-    public static final ModConfigSpec.BooleanValue AGE_BRIDGE;
+    public static final ForgeConfigSpec SPEC;
+    public static final ForgeConfigSpec.DoubleValue BOSS_HEALTH;
+    public static final ForgeConfigSpec.DoubleValue BOSS_DAMAGE;
+    public static final ForgeConfigSpec.IntValue ECHO_COUNT;
+    public static final ForgeConfigSpec.DoubleValue ECHO_HEALTH;
+    public static final ForgeConfigSpec.IntValue RETRY_DELAY;
+    public static final ForgeConfigSpec.IntValue LOCATOR_RADIUS;
+    public static final ForgeConfigSpec.BooleanValue AGE_BRIDGE;
     static {
-        var b = new ModConfigSpec.Builder();
+        var b = new ForgeConfigSpec.Builder();
         BOSS_HEALTH = b.comment("Chronicle Keeper base health before party scaling.").defineInRange("bossHealth", 900.0, 50, 1000000);
         BOSS_DAMAGE = b.comment("Chronicle Keeper attack damage before armor and pack scaling.").defineInRange("bossDamage", 10.0, 1, 1000);
         ECHO_COUNT = b.comment("Number of past memory echoes spawned per rewind.").defineInRange("echoCount", 3, 1, 12);

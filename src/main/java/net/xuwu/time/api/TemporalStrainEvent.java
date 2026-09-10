@@ -1,11 +1,12 @@
 package net.xuwu.time.api;
 
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.bus.api.Event;
-import net.neoforged.bus.api.ICancellableEvent;
+import net.minecraftforge.eventbus.api.Cancelable;
+import net.minecraftforge.eventbus.api.Event;
 
 /** Cancel to replace the default short slow/weakness penalty with pack-specific behavior. */
-public final class TemporalStrainEvent extends Event implements ICancellableEvent {
+@Cancelable
+public final class TemporalStrainEvent extends Event {
     private final ServerPlayer player;
     private final int age;
     public TemporalStrainEvent(ServerPlayer player, int age) { this.player = player; this.age = age; }

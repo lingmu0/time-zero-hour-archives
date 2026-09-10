@@ -32,7 +32,7 @@ public final class KeeperTelegraph {
         int edge = color(.95f * fade, 255, impact ? 230 : 118, 45);
         var pattern = boss.ringPattern();
         for (var polygon : pattern.polygons()) {
-            var first=polygon.getFirst();
+            var first=polygon.get(0);
             for(int i=1;i<polygon.size()-1;i++) {
                 var a=polygon.get(i);var b=polygon.get(i+1);
                 vertex(buffer,matrix,first.x(),0,first.z(),fill);vertex(buffer,matrix,a.x(),0,a.z(),fill);
@@ -78,6 +78,8 @@ public final class KeeperTelegraph {
         vertex(v,m,Math.cos(b)*outer,y,Math.sin(b)*outer,c);
         vertex(v,m,Math.cos(b)*inner,y,Math.sin(b)*inner,c);
     }
-    private static void vertex(VertexConsumer v, Matrix4f m, double x, double y, double z, int c) { v.addVertex(m,(float)x,(float)y,(float)z).setColor(c); }
+    private static void vertex(VertexConsumer v, Matrix4f m, double x, double y, double z, int c) {
+        v.vertex(m, (float)x, (float)y, (float)z).color((c >> 16) & 255, (c >> 8) & 255, c & 255, (c >>> 24) & 255).endVertex();
+    }
     private KeeperTelegraph() {}
 }

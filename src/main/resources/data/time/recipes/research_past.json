@@ -10,7 +10,7 @@
     "item": "minecraft:book"
   },
   "result": {
-    "id": "time:past_conclusion",
+    "item": "time:past_conclusion",
     "count": 1
   },
   "duration": 400,

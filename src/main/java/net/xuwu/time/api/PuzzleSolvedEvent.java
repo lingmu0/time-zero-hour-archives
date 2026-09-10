@@ -2,10 +2,10 @@ package net.xuwu.time.api;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.bus.api.Event;
+import net.minecraftforge.eventbus.api.Event;
 import net.xuwu.time.logic.PuzzleKind;
 
-/** Fired once per player/reward cycle on the NeoForge game bus. Suitable for NativeEvents. */
+/** Fired once per player/reward cycle on the Forge game bus. */
 public final class PuzzleSolvedEvent extends Event {
     private final ServerPlayer player;
     private final BlockPos controller;

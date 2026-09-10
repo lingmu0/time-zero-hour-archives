@@ -15,6 +15,6 @@ public final class KeeperGlowLayer<T extends Mob, M extends EntityModel<T>> exte
     @Override public void render(PoseStack pose, MultiBufferSource buffers, int light, T entity,
             float limbSwing, float limbAmount, float partial, float age, float headYaw, float headPitch) {
         if (entity.isInvisible() || entity instanceof TemporalEchoEntity echo && echo.mode() != TemporalEchoEntity.PARADOX) return;
-        getParentModel().renderToBuffer(pose, buffers.getBuffer(GLOW), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
+        getParentModel().renderToBuffer(pose, buffers.getBuffer(GLOW), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 1, 1, 1, 1);
     }
 }

@@ -10,7 +10,7 @@
     "item": "time:epoch_core"
   },
   "result": {
-    "id": "time:final_conclusion",
+    "item": "time:final_conclusion",
     "count": 1
   },
   "duration": 800

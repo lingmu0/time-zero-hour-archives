@@ -72,7 +72,7 @@ public final class ChallengeSigilItem extends Item {
     private static InteractionResultHolder<ItemStack> fail(ServerPlayer player,ItemStack stack,String key){
         player.displayClientMessage(Component.translatable("message.time."+key),true);return InteractionResultHolder.fail(stack);
     }
-    @Override public void appendHoverText(ItemStack stack,TooltipContext context,List<Component> lines,TooltipFlag flag){
+    @Override public void appendHoverText(ItemStack stack,Level level,List<Component> lines,TooltipFlag flag){
         lines.add(Component.translatable("message.time.challenge_hint"));
     }
 }

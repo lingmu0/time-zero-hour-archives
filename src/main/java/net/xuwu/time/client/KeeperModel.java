@@ -91,7 +91,8 @@ public final class KeeperModel<T extends Mob> extends EntityModel<T> {
         hoveringBook.z -= Mth.sin(age * .09f) * .3f;
     }
 
-    @Override public void renderToBuffer(PoseStack pose, VertexConsumer buffer, int light, int overlay, int color) {
-        root.render(pose, buffer, light, overlay, color);
+    @Override public void renderToBuffer(PoseStack pose, VertexConsumer buffer, int light, int overlay,
+            float red, float green, float blue, float alpha) {
+        root.render(pose, buffer, light, overlay);
     }
 }

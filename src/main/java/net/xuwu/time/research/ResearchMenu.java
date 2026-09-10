@@ -1,20 +1,24 @@
 package net.xuwu.time.research;
 
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.world.*;
-import net.minecraft.world.entity.player.*;
-import net.minecraft.world.inventory.*;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.inventory.SimpleContainerData;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.xuwu.time.registry.TimeContent;
 
 public final class ResearchMenu extends AbstractContainerMenu {
     private final Container container;
     private final ContainerData data;
-    public ResearchMenu(int id, Inventory inventory, RegistryFriendlyByteBuf buffer) {
+    public ResearchMenu(int id, Inventory inventory, FriendlyByteBuf buffer) {
         this(id, inventory, resolve(inventory, buffer), new SimpleContainerData(2));
     }
-    private static Container resolve(Inventory inventory, RegistryFriendlyByteBuf buffer) {
-        // Generic MenuProvider callers need no block payload; slot/data sync still works.
+    private static Container resolve(Inventory inventory, FriendlyByteBuf buffer) {
         if (buffer == null || buffer.readableBytes() < Long.BYTES) return new SimpleContainer(4);
         var be = inventory.player.level().getBlockEntity(buffer.readBlockPos());
         return be instanceof ResearchDeskBlockEntity desk ? desk : new SimpleContainer(4);

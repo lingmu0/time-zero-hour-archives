@@ -29,12 +29,12 @@ public final class PuzzleNodeBlockEntity extends BlockEntity {
             puzzle.step(player, index, getBlockPos());
         }
     }
-    @Override protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
+    @Override protected void saveAdditional(CompoundTag tag) {
+        super.saveAdditional(tag);
         tag.putLong("Controller", controller.asLong()); tag.putInt("Index", index); tag.putBoolean("Configured", configured);
     }
-    @Override protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
+    @Override public void load(CompoundTag tag) {
+        super.load(tag);
         controller = BlockPos.of(tag.getLong("Controller")); index = tag.getInt("Index"); configured = tag.getBoolean("Configured");
     }
 }

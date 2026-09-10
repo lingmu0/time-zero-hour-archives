@@ -13,7 +13,7 @@
     }
   ],
   "result": {
-    "id": "time:archive_probe",
+    "item": "time:archive_probe",
     "count": 1
   }
 }

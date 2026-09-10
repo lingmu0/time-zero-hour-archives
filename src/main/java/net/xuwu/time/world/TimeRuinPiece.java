@@ -4,11 +4,9 @@ import java.util.*;
 import net.minecraft.core.*;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.*;
@@ -93,18 +91,11 @@ public final class TimeRuinPiece extends StructurePiece {
         BlockPos at = p(x, y, z);
         block(level, clip, x, y, z, Blocks.DARK_OAK_SIGN.defaultBlockState().setValue(StandingSignBlock.ROTATION, 8));
         if (clip.isInside(at) && level.getBlockEntity(at) instanceof SignBlockEntity be) {
-            SignText text = new SignText().setColor(DyeColor.LIGHT_BLUE).setHasGlowingText(true)
-                .setMessage(1, Component.literal(line1)).setMessage(2, Component.literal(line2));
-            // ProtoChunk block entities have no Level during world generation. Sign setters
-            // send live-world updates and crash there; initialize through the same NBT path
-            // used by structure templates instead, without touching the live ServerLevel.
-            var encoded = SignText.DIRECT_CODEC.encodeStart(
-                level.registryAccess().createSerializationContext(NbtOps.INSTANCE), text).getOrThrow();
             CompoundTag data = new CompoundTag();
-            data.put("front_text", encoded); data.put("back_text", encoded.copy());
-            data.putBoolean("is_waxed", true);
-            be.loadWithComponents(data, level.registryAccess());
-            be.setChanged();
+            data.putString("Text1", Component.Serializer.toJson(Component.literal(line1)));
+            data.putString("Text2", Component.Serializer.toJson(Component.literal(line2)));
+            data.putString("Text3", "\"\""); data.putString("Text4", "\"\"");
+            be.load(data); be.setChanged();
         }
     }
     private void node(WorldGenLevel level, BoundingBox clip, BlockPos controller, int x, int y, int z, int index) {
@@ -175,7 +166,7 @@ public final class TimeRuinPiece extends StructurePiece {
                     block(level, clip, x, 1, 3, Blocks.SUSPICIOUS_SAND.defaultBlockState());
                     BlockPos at = p(x, 1, 3);
                     if (clip.isInside(at) && level.getBlockEntity(at) instanceof BrushableBlockEntity be)
-                        be.setLootTable(ResourceKey.create(Registries.LOOT_TABLE, TimeMod.id("archaeology/temporal_dust")), at.asLong());
+                        be.setLootTable(TimeMod.id("archaeology/temporal_dust"), at.asLong());
                 }
             }
             chest(level, clip, 3, 1, (kinds.length - 1) * 24 + 17, variant == 0 ? "observatory" : "archive");
@@ -295,7 +286,7 @@ public final class TimeRuinPiece extends StructurePiece {
         BlockPos at = p(x,y,z);
         block(level, clip, x,y,z, Blocks.CHEST.defaultBlockState());
         if (clip.isInside(at) && level.getBlockEntity(at) instanceof ChestBlockEntity chest) {
-            chest.setLootTable(ResourceKey.create(Registries.LOOT_TABLE, TimeMod.id("chests/" + loot)), at.asLong());
+            chest.setLootTable(TimeMod.id("chests/" + loot), at.asLong());
         }
     }
 }

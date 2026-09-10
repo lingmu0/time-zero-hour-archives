@@ -52,7 +52,7 @@ public final class ChronalBoltEntity extends Projectile {
             owner.level().addFreshEntity(bolt);
         }
     }
-    @Override protected void defineSynchedData(SynchedEntityData.Builder builder) {}
+    @Override protected void defineSynchedData() {}
     @Override public void tick() {
         super.tick();
         if (!level().isClientSide) {

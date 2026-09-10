@@ -46,11 +46,12 @@ public final class TemporalEchoEntity extends Monster implements ChronalCaster {
     public static AttributeSupplier.Builder attributes() {
         return Monster.createMonsterAttributes().add(Attributes.MAX_HEALTH, 18).add(Attributes.ATTACK_DAMAGE, 4).add(Attributes.MOVEMENT_SPEED, .27);
     }
-    @Override protected void defineSynchedData(SynchedEntityData.Builder builder) {
-        super.defineSynchedData(builder); builder.define(MODE, HOSTILE);
-        builder.define(RING_AT,-1L); builder.define(CAST_AT,-1L); builder.define(SWAP_AT,-1L); builder.define(CAST,0);
-        builder.define(MIN,BlockPos.ZERO); builder.define(MAX,BlockPos.ZERO);
-        builder.define(RING_PATTERN,new CompoundTag());
+    @Override protected void defineSynchedData() {
+        super.defineSynchedData();
+        entityData.define(MODE, HOSTILE);
+        entityData.define(RING_AT,-1L); entityData.define(CAST_AT,-1L); entityData.define(SWAP_AT,-1L); entityData.define(CAST,0);
+        entityData.define(MIN,BlockPos.ZERO); entityData.define(MAX,BlockPos.ZERO);
+        entityData.define(RING_PATTERN,new CompoundTag());
     }
     @Override public Mob caster() { return this; }
     @Override public long ringImpactTime() { return entityData.get(RING_AT); }
@@ -64,10 +65,10 @@ public final class TemporalEchoEntity extends Monster implements ChronalCaster {
         if (mode()!=PARADOX) return super.tickHeadTurn(movementYaw,limbAmount);
         yBodyRot=getYRot(); return limbAmount;
     }
-    @Override public void lerpTo(double x, double y, double z, float yaw, float pitch, int steps) {
+    @Override public void lerpTo(double x, double y, double z, float yaw, float pitch, int steps, boolean teleport) {
         // Match the real body's instantaneous swap, including render-frame history.
         boolean snap = level().isClientSide && mode() == PARADOX && (swapping() || distanceToSqr(x, y, z) > 4);
-        super.lerpTo(x, y, z, yaw, pitch, snap ? 0 : steps);
+        super.lerpTo(x, y, z, yaw, pitch, snap ? 0 : steps, snap || teleport);
         if (snap) {
             setPos(x, y, z); setYRot(yaw); setXRot(pitch);
             setDeltaMovement(Vec3.ZERO); setOldPosAndRot();
@@ -105,8 +106,8 @@ public final class TemporalEchoEntity extends Monster implements ChronalCaster {
         setPersistenceRequired();
     }
     public int mode() { return entityData.get(MODE); }
-    @Override protected EntityDimensions getDefaultDimensions(Pose pose) {
-        return mode() == PARADOX ? EntityDimensions.scalable(1.2f, 3.2f) : super.getDefaultDimensions(pose);
+    @Override public EntityDimensions getDimensions(Pose pose) {
+        return mode() == PARADOX ? EntityDimensions.scalable(1.2f, 3.2f) : super.getDimensions(pose);
     }
     @Override public void onSyncedDataUpdated(EntityDataAccessor<?> key) {
         super.onSyncedDataUpdated(key);
@@ -164,7 +165,7 @@ public final class TemporalEchoEntity extends Monster implements ChronalCaster {
         if (ringImpactTime()>=0 && now>=ringImpactTime() && !ringResolved) {
             ringResolved=true;
             RingAttacks.resolve(this,targets,damage);
-            level().playSound(null,blockPosition(),SoundEvents.TRIDENT_THUNDER.value(),SoundSource.HOSTILE,.7f,1.5f);
+            level().playSound(null,blockPosition(),SoundEvents.TRIDENT_THUNDER,SoundSource.HOSTILE,.7f,1.5f);
         }
         if (castAge(0)>=(castKind()==ChronicleKeeperEntity.CAST_RING?40:24)) { entityData.set(CAST,0); castTarget=null; }
     }

@@ -10,7 +10,7 @@ import net.xuwu.time.entity.ChronicleKeeperEntity;
 
 /** The same scrolling additive energy material used by a charged creeper. */
 public final class KeeperShieldLayer extends RenderLayer<ChronicleKeeperEntity, KeeperModel<ChronicleKeeperEntity>> {
-    private static final ResourceLocation ENERGY = ResourceLocation.withDefaultNamespace("textures/entity/creeper/creeper_armor.png");
+    private static final ResourceLocation ENERGY = new ResourceLocation("minecraft", "textures/entity/creeper/creeper_armor.png");
     public KeeperShieldLayer(RenderLayerParent<ChronicleKeeperEntity, KeeperModel<ChronicleKeeperEntity>> parent) { super(parent); }
     @Override public void render(PoseStack pose, MultiBufferSource buffers, int light, ChronicleKeeperEntity boss,
             float swing, float amount, float partial, float age, float yaw, float pitch) {
@@ -18,7 +18,7 @@ public final class KeeperShieldLayer extends RenderLayer<ChronicleKeeperEntity, 
         pose.pushPose();
         pose.scale(1.055f, 1.035f, 1.055f);
         getParentModel().renderToBuffer(pose, buffers.getBuffer(RenderType.energySwirl(ENERGY, age * .012f % 1, age * .009f % 1)),
-                LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0xFF80BFFF);
+                LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, .5f, .75f, 1f, 1f);
         pose.popPose();
     }
 }
