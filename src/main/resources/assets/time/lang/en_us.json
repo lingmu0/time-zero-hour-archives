@@ -1,4 +1,13 @@
 {
+  "phase.time.ascension": "Endless Ascension",
+  "block.time.sanctum_platform": "Sanctum Glass Platform",
+  "message.time.sanctum_enter": "The end is not yet written. Pursue the Keeper upward, away from the black tide.",
+  "message.time.sanctum_missing": "Sanctum unavailable; challenge safely ended. Check the time:sanctum dimension data.",
+  "item.time.ascension_challenge_sigil": "Endless Ascension Challenge Sigil",
+  "message.time.ascension_challenge_hint": "Use: skip the first act and enter the second-act challenge. Sneak-use: return. No research progress or ruin rewards.",
+  "message.time.ascension_challenge_started": "Second-act challenge started. Pursue the Keeper upward, away from the black tide.",
+  "message.time.ascension_challenge_nearby": "A Chronicle Keeper challenge is already nearby. Finish or leave it first.",
+  "message.time.ascension_already_in_fight": "You are already in an Endless Ascension challenge.",
   "item.time.challenge_sigil": "Final Chronicle Challenge Sigil",
   "message.time.challenge_hint": "Use: enter the dedicated boss arena without research or keys. Sneak-use: return. Multiplayer shares the current fight; reusable.",
   "message.time.challenge_entered": "Entered the challenge arena. All phase shields and mechanics remain. Sneak-use the sigil to return.",

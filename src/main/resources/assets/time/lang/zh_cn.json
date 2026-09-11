@@ -1,4 +1,13 @@
 {
+  "phase.time.ascension": "无尽升华",
+  "block.time.sanctum_platform": "圣域玻璃平台",
+  "message.time.sanctum_enter": "终末尚未结束。追随编年者向上，避开下方黑潮。",
+  "message.time.sanctum_missing": "圣域不可用，挑战已安全终止。请检查 time:sanctum 维度数据。",
+  "item.time.ascension_challenge_sigil": "无尽升华挑战徽记",
+  "message.time.ascension_challenge_hint": "右键：跳过第一幕，直接进入二阶段挑战；潜行右键：返回进入前的位置。不计入研究进度，不发放遗迹奖励。",
+  "message.time.ascension_challenge_started": "二阶段挑战已开始。向上追踪编年者，避开黑潮。",
+  "message.time.ascension_challenge_nearby": "附近已有编年者挑战，请先完成或离开当前挑战。",
+  "message.time.ascension_already_in_fight": "你已经在无尽升华挑战中。",
   "item.time.challenge_sigil": "终末挑战徽记",
   "message.time.challenge_hint": "右键：无视研究进度与钥匙，进入独立 Boss 挑战场。潜行右键：返回进入前的位置。多人共享当前战斗；不消耗。",
   "message.time.challenge_entered": "已进入终末挑战场。四相护盾与所有阶段机制保留；潜行右键徽记可返回。",

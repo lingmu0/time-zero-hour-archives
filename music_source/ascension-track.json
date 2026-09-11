@@ -1,0 +1,12 @@
+{
+  "title": "拯救的代价 / The Cost of Salvation",
+  "asset": "src/main/resources/assets/time/sounds/music/ascension_battle.ogg",
+  "license_status": "unverified-user-supplied",
+  "author": "Not verified",
+  "sha256": "59827832413b20e59a691c816d12e32b72f7bad2234f11dab860d47df6a84ab5",
+  "sample_rate": 44100,
+  "channels": 2,
+  "frames": 6115328,
+  "duration_seconds": 138.66956916099772,
+  "processing": "Complete track; gain reduction; 10 ms edge fades; Ogg Vorbis encoding."
+}

@@ -10,9 +10,11 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.xuwu.time.TimeMod;
+import net.xuwu.time.entity.AscensionFight;
 import net.xuwu.time.entity.ChronicleKeeperEntity;
+import net.xuwu.time.registry.TimeContent;
 
-/** Client-owned playback follows the formal encounter, not phase changes or false bodies. */
+/** Client-owned playback follows the formal encounter and starts the second-act track only in the sanctum. */
 @Mod.EventBusSubscriber(modid = TimeMod.ID, value = Dist.CLIENT)
 public final class BossMusicManager {
     private static ClientLevel level;
@@ -26,16 +28,23 @@ public final class BossMusicManager {
         if (mc.level == null || mc.player == null) { clear(); return; }
         if (mc.isPaused()) return;
 
-        boolean fighting = findEncounter(mc) != null
+        ChronicleKeeperEntity encounter = findEncounter(mc);
+        boolean fighting = encounter != null
             && mc.options.getSoundSourceVolume(SoundSource.MUSIC) > 0
             && mc.options.getSoundSourceVolume(SoundSource.MASTER) > 0;
+        // The server marks the transition before the dimension hop. Do not play the
+        // sanctum track until this client is actually in the new space.
+        boolean inSanctum = mc.level.dimension().equals(AscensionFight.DIMENSION);
+        boolean ascension = inSanctum && encounter != null && encounter.ascended();
         var sounds = mc.getSoundManager();
-        if (music != null && (music.isStopped() || --startupGrace <= 0 && !sounds.isActive(music))) {
+        if (music != null && (music.isStopped() || music.isAscension() != ascension
+                || --startupGrace <= 0 && !sounds.isActive(music))) {
             music.stopImmediately(); sounds.stop(music); music = null;
         }
         if (music == null && fighting) {
             mc.getMusicManager().stopPlaying();
-            music = new BossMusicSound(); startupGrace = 40;
+            music = new BossMusicSound(ascension ? TimeContent.ASCENSION_BOSS_MUSIC.get() : TimeContent.BOSS_MUSIC.get(), ascension);
+            startupGrace = 40;
             sounds.play(music);
         }
         // Forge 1.20.1 has no SelectMusicEvent. Keep ambient music suppressed while

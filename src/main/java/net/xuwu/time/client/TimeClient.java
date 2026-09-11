@@ -3,6 +3,7 @@ package net.xuwu.time.client;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
+import net.minecraftforge.client.event.RegisterDimensionSpecialEffectsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -16,6 +17,9 @@ public final class TimeClient {
         event.registerEntityRenderer(TimeContent.ARCHIVE_SCRIBE.get(), context -> new ChronalRenderer<>(context, .82f));
         event.registerEntityRenderer(TimeContent.TEMPORAL_ECHO.get(), TemporalEchoRenderer::new);
         event.registerEntityRenderer(TimeContent.CHRONAL_BOLT.get(), ChronalBoltRenderer::new);
+    }
+    @SubscribeEvent public static void dimensions(RegisterDimensionSpecialEffectsEvent event) {
+        event.register(TimeMod.id("sanctum"), new SanctumEffects());
     }
     @SubscribeEvent public static void layers(EntityRenderersEvent.RegisterLayerDefinitions event) {
         event.registerLayerDefinition(ChronalModel.LAYER, ChronalModel::createLayer);

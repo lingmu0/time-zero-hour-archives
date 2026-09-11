@@ -22,7 +22,8 @@ public final class ChronicleBossBarOverlay {
     public static void render(RenderGuiOverlayEvent.Post event) {
         if (event.getOverlay() != VanillaGuiOverlay.BOSS_EVENT_PROGRESS.type()) return;
         Minecraft minecraft = Minecraft.getInstance();
-        if (findEncounter(minecraft) == null) return;
+        var boss = findEncounter(minecraft);
+        if (boss == null || boss.ascended()) return;
         int left = event.getGuiGraphics().guiWidth() / 2 - 91;
         for (int boundary = 0; boundary < 4; boundary++) {
             int x = left + Math.round(BAR_WIDTH * EncounterRules.phaseBoundary(boundary));

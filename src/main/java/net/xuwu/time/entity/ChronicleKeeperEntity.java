@@ -25,6 +25,8 @@ import net.xuwu.time.logic.EncounterRules;
 import net.xuwu.time.registry.TimeContent;
 
 public final class ChronicleKeeperEntity extends Monster implements ChronalCaster {
+    private static final EntityDataAccessor<CompoundTag> ASCENSION = SynchedEntityData.defineId(ChronicleKeeperEntity.class, EntityDataSerializers.COMPOUND_TAG);
+    private final AscensionFight ascension = new AscensionFight(this);
     private static final EntityDataAccessor<Long> SWAP_AT = SynchedEntityData.defineId(ChronicleKeeperEntity.class, EntityDataSerializers.LONG);
     double hoverAngle;
     private int swapClock;
@@ -69,7 +71,7 @@ public final class ChronicleKeeperEntity extends Monster implements ChronalCaste
         entityData.define(PHASE, 0); entityData.define(SHIELD, true); entityData.define(SAFE, 0);
         entityData.define(ARENA_MIN, BlockPos.ZERO); entityData.define(ARENA_MAX, BlockPos.ZERO); entityData.define(ORIGIN, BlockPos.ZERO);
         entityData.define(RING_AT, -1L); entityData.define(CAST_AT, -1L); entityData.define(CAST, 0); entityData.define(SWAP_AT, -1L);
-        entityData.define(RING_PATTERN, new CompoundTag());
+        entityData.define(RING_PATTERN, new CompoundTag()); entityData.define(ASCENSION, new CompoundTag());
     }
     @Override protected void registerGoals() { /* Encounter owns target selection. */ }
     @Override protected float tickHeadTurn(float movementYaw, float limbAmount) {
@@ -88,13 +90,47 @@ public final class ChronicleKeeperEntity extends Monster implements ChronalCaste
         }
     }
     public void bind(BlockPos controller, BlockPos home, int players) {
-        this.controller = controller.immutable(); this.home = home.immutable();
+        this.controller = controller == null ? null : controller.immutable(); this.home = home.immutable();
         anchors.randomize(random.nextLong());
         syncArena();
         getAttribute(Attributes.MAX_HEALTH).setBaseValue(TimeConfig.BOSS_HEALTH.get() * EncounterRules.partyScale(players));
         getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(TimeConfig.BOSS_DAMAGE.get()); setHealth(getMaxHealth());
     }
+    public void bindDirect(BlockPos spawn) {
+        this.controller = null; this.home = spawn.immutable(); syncArena();
+        getAttribute(Attributes.MAX_HEALTH).setBaseValue(TimeConfig.BOSS_SECOND_HEALTH.get());
+        getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(TimeConfig.BOSS_DAMAGE.get());
+        prepareAscensionHealth();
+    }
+    public boolean beginDirect(ServerPlayer player) {
+        if (!(level() instanceof ServerLevel) || !isAlive()) return false;
+        ascension.begin(null, List.of(player)); return true;
+    }
     public int phase() { return entityData.get(PHASE); }
+    public CompoundTag ascensionView() { return entityData.get(ASCENSION); }
+    public boolean ascended() { return ascensionView().getInt("Mode") == 2; }
+    public boolean transitioning() { return ascensionView().getInt("Mode") == 1; }
+    void syncAscension(CompoundTag view, AABB arena) {
+        entityData.set(ASCENSION, view);
+        if (arena != null) {
+            entityData.set(ARENA_MIN, BlockPos.containing(arena.minX, arena.minY, arena.minZ));
+            entityData.set(ARENA_MAX, BlockPos.containing(arena.maxX - 1, arena.maxY - 1, arena.maxZ - 1));
+            entityData.set(ORIGIN, new BlockPos(view.getInt("X"), 64, view.getInt("Z")));
+        }
+    }
+    void prepareAscensionHealth() {
+        unsettledDamage = 0; restoreCleanup = false; rewindTicks = 0;
+        debts.clear(); recordedPlayers.clear(); clearCombatVisuals();
+        entityData.set(PHASE, 4); entityData.set(SHIELD, false); entityData.set(SWAP_AT, -1L);
+        getAttribute(Attributes.MAX_HEALTH).setBaseValue(TimeConfig.BOSS_SECOND_HEALTH.get());
+        setHealth(getMaxHealth());
+        bossBar.setName(Component.translatable("entity.time.chronicle_keeper").append(" · ").append(Component.translatable("phase.time.ascension")));
+    }
+    void faceAscensionTarget(ServerPlayer target) { faceTarget(target); }
+    void castAscensionBolt(ServerPlayer target) {
+        beginCast(CAST_BOLT, target);
+        level().playSound(null, blockPosition(), SoundEvents.EVOKER_CAST_SPELL, SoundSource.HOSTILE, .8f, 1.1f);
+    }
     public UUID bossBarId() { return bossBar.getId(); }
     @Override public Mob caster() { return this; }
     @Override public long swapStartedAt() { return entityData.get(SWAP_AT); }
@@ -109,7 +145,7 @@ public final class ChronicleKeeperEntity extends Monster implements ChronalCaste
     public float castAge(float partial) { return entityData.get(CAST_AT) < 0 ? 1000 : level().getGameTime() - entityData.get(CAST_AT) + partial; }
     /** Stores final post-armor damage for gradual server-side settlement. */
     public void queueDamage(float amount) {
-        if (level().isClientSide || shielded() || !isAlive() || Float.isNaN(amount) || amount <= 0) return;
+        if (level().isClientSide || transitioning() || shielded() || !isAlive() || Float.isNaN(amount) || amount <= 0) return;
         float available = EncounterRules.phaseDamageRemaining(getHealth(), getMaxHealth(), phase());
         if (available <= 0) return;
         double pending = Double.isFinite(unsettledDamage) && unsettledDamage > 0 ? unsettledDamage : 0;
@@ -123,9 +159,17 @@ public final class ChronicleKeeperEntity extends Monster implements ChronalCaste
         applied = EncounterRules.limitFinalDamage(getHealth(), getMaxHealth(), phase(), applied);
         if (applied <= 0) { unsettledDamage = 0; return; }
         float before = getHealth();
+        if (phase() == 4 && applied >= before && !ascended()) {
+            unsettledDamage = 0; cleanupEchoes(); clearCombatVisuals();
+            if (level() instanceof ServerLevel server)
+                for (var bolt : server.getEntitiesOfClass(ChronalBoltEntity.class, bounds().inflate(16), b -> b.getOwner() == this)) bolt.discard();
+            ascension.begin(controller, players());
+            return;
+        }
         setHealth(Math.max(0, before - applied));
-        unsettledDamage = Math.max(0, unsettledDamage - applied);
-        if (getHealth() <= 0 && isAlive()) die(damageSources().generic());
+        // Use the representable health delta so lethal queued hits cannot strand a tiny remainder.
+        unsettledDamage = before == getHealth() ? 0 : Math.max(0, unsettledDamage - (before - getHealth()));
+        if (getHealth() <= 0) die(damageSources().generic());
     }
     private void syncArena() {
         if (home == null) return;
@@ -154,6 +198,7 @@ public final class ChronicleKeeperEntity extends Monster implements ChronalCaste
         entityData.set(RING_AT, -1L); entityData.set(CAST, 0); castTarget = null;
     }
     private PuzzleControllerBlockEntity puzzle() {
+        if (ascended()) return null;
         return controller != null && level().hasChunkAt(controller) && level().getBlockEntity(controller) instanceof PuzzleControllerBlockEntity p ? p : null;
     }
     private AABB bounds() { return puzzle() != null ? puzzle().arena() : hasArenaVisuals() ? visualArena() : getBoundingBox().inflate(22); }
@@ -192,6 +237,7 @@ public final class ChronicleKeeperEntity extends Monster implements ChronalCaste
         }
         if (Float.isNaN(amount) || amount <= 0) return false;
         if (level().isClientSide) return false;
+        if (transitioning()) return false;
         if (shielded()) {
             if (source.getEntity() instanceof ServerPlayer player)
                 player.displayClientMessage(Component.translatable("message.time.shield_order_hint"), true);
@@ -222,10 +268,19 @@ public final class ChronicleKeeperEntity extends Monster implements ChronalCaste
     @Override public void tick() {
         super.tick();
         if (!(level() instanceof ServerLevel server) || !isAlive()) return;
+        if (ascension.mode() != 0) {
+            if (ascended()) settlePendingDamage();
+            if (!isAlive()) return;
+            bossBar.setProgress(Math.max(0, Math.min(1, getHealth() / getMaxHealth())));
+            if (castAge(0) >= castDuration()) { entityData.set(CAST, 0); castTarget = null; }
+            ascension.tick();
+            return;
+        }
         if (home == null) { home = blockPosition(); syncArena(); }
         if (controller != null && !hasArenaVisuals()) syncArena();
         if (controller == null) entityData.set(SHIELD, false);
         settlePendingDamage();
+        if (transitioning()) return;
         if (!isAlive()) return;
         bossBar.setProgress(Math.max(0, Math.min(1, getHealth() / getMaxHealth())));
         if (controller != null && puzzle() == null) {
@@ -444,13 +499,15 @@ public final class ChronicleKeeperEntity extends Monster implements ChronalCaste
     @Override public void die(DamageSource source) {
         if (!level().isClientSide) {
             cleanupEchoes(); bossBar.removeAllPlayers();
-            if (puzzle() != null) puzzle().encounterDefeated(getUUID());
+            if (ascension.mode() != 0) ascension.finish(true);
+            else if (puzzle() != null) puzzle().encounterDefeated(getUUID());
         }
         super.die(source);
     }
     @Override public boolean removeWhenFarAway(double distance) { return false; }
     @Override public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
+        tag.put("Ascension", ascension.save());
         if (controller != null) tag.putLong("Controller", controller.asLong());
         if (home != null) tag.putLong("Home", home.asLong());
         tag.putInt("Phase", phase()); tag.putBoolean("Shield", shielded()); tag.putInt("Safe", safeQuadrant());
@@ -470,5 +527,10 @@ public final class ChronicleKeeperEntity extends Monster implements ChronalCaste
         clock = tag.getInt("Clock"); phaseTicks = tag.getInt("PhaseTicks"); nextStaffTick = clock + 20; nextRingTick = clock + 60;
         restoreCleanup = true; rewindTicks = 0; debts.clear(); setNoGravity(true);
         clearCombatVisuals(); syncArena();
+        if (tag.contains("Ascension")) ascension.load(tag.getCompound("Ascension"));
+        if (ascended()) {
+            restoreCleanup = false;
+            bossBar.setName(Component.translatable("entity.time.chronicle_keeper").append(" · ").append(Component.translatable("phase.time.ascension")));
+        }
     }
 }

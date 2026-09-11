@@ -33,12 +33,14 @@ import net.xuwu.time.block.PuzzleControllerBlock;
 import net.xuwu.time.block.PuzzleControllerBlockEntity;
 import net.xuwu.time.block.PuzzleNodeBlock;
 import net.xuwu.time.block.PuzzleNodeBlockEntity;
+import net.xuwu.time.block.SanctumPlatformBlock;
 import net.xuwu.time.entity.ArchiveScribeEntity;
 import net.xuwu.time.entity.ChronalBoltEntity;
 import net.xuwu.time.entity.ChronicleKeeperEntity;
 import net.xuwu.time.entity.TemporalEchoEntity;
 import net.xuwu.time.entity.TemporalStasisEffect;
 import net.xuwu.time.item.ArchiveItem;
+import net.xuwu.time.item.AscensionChallengeItem;
 import net.xuwu.time.item.ChallengeSigilItem;
 import net.xuwu.time.item.LocatorItem;
 import net.xuwu.time.research.ResearchDeskBlock;
@@ -54,6 +56,8 @@ public final class TimeContent {
     public static final DeferredRegister<SoundEvent> SOUNDS = DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, TimeMod.ID);
     public static final RegistryObject<SoundEvent> BOSS_MUSIC = SOUNDS.register("music.chronicle_keeper",
         () -> SoundEvent.createVariableRangeEvent(TimeMod.id("music.chronicle_keeper")));
+    public static final RegistryObject<SoundEvent> ASCENSION_BOSS_MUSIC = SOUNDS.register("music.chronicle_keeper_ascension",
+        () -> SoundEvent.createVariableRangeEvent(TimeMod.id("music.chronicle_keeper_ascension")));
     public static final RegistryObject<SoundEvent> ZERO_HOUR_MUSIC = SOUNDS.register("music_disc.zero_hour",
         () -> SoundEvent.createVariableRangeEvent(TimeMod.id("music_disc.zero_hour")));
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, TimeMod.ID);
@@ -73,6 +77,8 @@ public final class TimeContent {
         return BlockBehaviour.Properties.of().strength(-1, 3600000).noLootTable().sound(SoundType.COPPER);
     }
     public static final RegistryObject<Block> CHRONAL_STONE = BLOCKS.register("chronal_stone", () -> new Block(mechanism()));
+    public static final RegistryObject<SanctumPlatformBlock> SANCTUM_PLATFORM = BLOCKS.register("sanctum_platform",
+        () -> new SanctumPlatformBlock(mechanism().sound(SoundType.GLASS).dynamicShape().noOcclusion().lightLevel(s -> 12)));
     public static final RegistryObject<Block> TEMPORAL_BARRIER = BLOCKS.register("temporal_barrier", () -> new Block(mechanism().lightLevel(s -> 8)));
     public static final RegistryObject<PuzzleControllerBlock> CONTROLLER = BLOCKS.register("puzzle_controller", () -> new PuzzleControllerBlock(mechanism()));
     public static final RegistryObject<PuzzleNodeBlock> NODE = BLOCKS.register("chronal_pedestal",
@@ -97,6 +103,8 @@ public final class TimeContent {
     public static final RegistryObject<Item> TEMPORAL_DUST = item("temporal_dust");
     public static final RegistryObject<ChallengeSigilItem> CHALLENGE_SIGIL = ITEMS.register("challenge_sigil",
         () -> new ChallengeSigilItem(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC).fireResistant()));
+    public static final RegistryObject<AscensionChallengeItem> ASCENSION_CHALLENGE_SIGIL = ITEMS.register("ascension_challenge_sigil",
+        () -> new AscensionChallengeItem(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC).fireResistant()));
     public static final RegistryObject<Item> MUSIC_DISC_ZERO_HOUR = ITEMS.register("music_disc_zero_hour",
         () -> new RecordItem(12, ZERO_HOUR_MUSIC.get(), new Item.Properties().stacksTo(1).rarity(Rarity.RARE), 1600));
     public static final RegistryObject<Item> PAST_RECORD = item("past_record");
@@ -127,6 +135,7 @@ public final class TimeContent {
 
     static {
         ITEMS.register("chronal_stone", () -> new BlockItem(CHRONAL_STONE.get(), new Item.Properties()));
+        ITEMS.register("sanctum_platform", () -> new BlockItem(SANCTUM_PLATFORM.get(), new Item.Properties()));
         ITEMS.register("temporal_barrier", () -> new BlockItem(TEMPORAL_BARRIER.get(), new Item.Properties()));
         ITEMS.register("puzzle_controller", () -> new BlockItem(CONTROLLER.get(), new Item.Properties()));
         ITEMS.register("chronal_pedestal", () -> new BlockItem(NODE.get(), new Item.Properties()));
