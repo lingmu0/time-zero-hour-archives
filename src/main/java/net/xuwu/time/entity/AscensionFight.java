@@ -13,7 +13,9 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.portal.PortalInfo;
 import net.minecraft.world.phys.*;
+import net.minecraftforge.common.util.ITeleporter;
 import net.xuwu.time.TimeConfig;
 import net.xuwu.time.TimeMod;
 import net.xuwu.time.block.PuzzleControllerBlockEntity;
@@ -132,7 +134,17 @@ public final class AscensionFight {
         mode = 2; ticks = 0; rise = 0; tideRise = 0; shift = 0;
         reconcilePlatforms(destination);
         boss.prepareAscensionHealth(); sync();
-        var moved = boss.changeDimension(destination);
+        // Forge's no-argument changeDimension delegates to PortalForcer. That
+        // vanilla path intentionally returns null for custom dimensions (it
+        // only knows the Nether/End portal rules), even when the ServerLevel
+        // itself is loaded. Supply an explicit portal entry point for sanctum.
+        var moved = boss.changeDimension(destination, new ITeleporter() {
+            @Override
+            public PortalInfo getPortalInfo(net.minecraft.world.entity.Entity entity, ServerLevel target,
+                                            java.util.function.Function<ServerLevel, PortalInfo> defaultInfo) {
+                return new PortalInfo(new Vec3(siteX + .5, 72, siteZ + .5), Vec3.ZERO, entity.getYRot(), 0);
+            }
+        });
         if (!(moved instanceof ChronicleKeeperEntity keeper)) {
             cleanupPlatforms(destination); mode = 1;
             for (var player : players) player.sendSystemMessage(Component.translatable("message.time.sanctum_missing"));

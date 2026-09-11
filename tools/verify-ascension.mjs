@@ -42,6 +42,8 @@ assert(fight.includes('Math.max(0, tier - 3); i <= tier + 4'));
 assert(fight.includes('rise += ascentSpeed'));
 assert(fight.includes('tideRise += ascentSpeed'));
 assert(fight.includes('platformSyncInterval'));
+assert(fight.includes('changeDimension(destination, new ITeleporter'));
+assert(fight.includes('new PortalInfo(new Vec3(siteX + .5, 72, siteZ + .5)'));
 
 const musicManager = read('src/main/java/net/xuwu/time/client/BossMusicManager.java');
 assert(musicManager.includes('mc.level.dimension().equals(AscensionFight.DIMENSION)'));
