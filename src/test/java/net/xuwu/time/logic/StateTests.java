@@ -64,6 +64,9 @@ public final class StateTests {
         check(EncounterRules.limitFinalDamage(10,900,4,100) == 10, "final phase remains killable");
         check(EncounterRules.limitFinalDamage(900,900,0,-1) == 0, "negative damage ignored");
         check(EncounterRules.limitFinalDamage(900,900,0,Float.NaN) == 0, "invalid damage never poisons health");
+        check(EncounterRules.perTickDamage(100, 900) == .9f, "queued damage settles at one-thousandth max health per tick");
+        check(EncounterRules.perTickDamage(.4f, 900) == .4f, "queued damage below the tick cap settles completely");
+        check(EncounterRules.phaseDamageRemaining(900, 900, 0) == 180, "queued damage cannot cross a phase boundary");
         check(EncounterRules.safeQuadrant(0) == 0 && EncounterRules.safeQuadrant(1) == 2
             && EncounterRules.safeQuadrant(2) == 3 && EncounterRules.safeQuadrant(3) == 1
             && EncounterRules.safeQuadrant(4) == 0, "counter-clockwise safe quadrant order");

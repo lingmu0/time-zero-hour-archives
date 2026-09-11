@@ -45,8 +45,9 @@ public final class ChronicleKeeperEntity extends Monster implements ChronalCaste
     private int lastPattern = -1, nextStaffTick, nextRingTick = 120;
     private UUID castTarget;
     private boolean ringResolved, administrativeDamage;
+    private double unsettledDamage;
     private int damageDepth;
-    private final ServerBossEvent bossBar = new ServerBossEvent(Component.translatable("entity.time.chronicle_keeper"), BossEvent.BossBarColor.PURPLE, BossEvent.BossBarOverlay.PROGRESS);
+    private final ServerBossEvent bossBar = new ServerBossEvent(Component.translatable("entity.time.chronicle_keeper"), BossEvent.BossBarColor.WHITE, BossEvent.BossBarOverlay.PROGRESS);
     private BlockPos controller, home;
     private int clock, phaseTicks, emptyTicks, rewindTicks;
     private boolean restoreCleanup;
@@ -94,6 +95,7 @@ public final class ChronicleKeeperEntity extends Monster implements ChronalCaste
         getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(TimeConfig.BOSS_DAMAGE.get()); setHealth(getMaxHealth());
     }
     public int phase() { return entityData.get(PHASE); }
+    public UUID bossBarId() { return bossBar.getId(); }
     @Override public Mob caster() { return this; }
     @Override public long swapStartedAt() { return entityData.get(SWAP_AT); }
     public boolean shielded() { return entityData.get(SHIELD); }
@@ -105,6 +107,26 @@ public final class ChronicleKeeperEntity extends Monster implements ChronalCaste
     @Override public net.xuwu.time.logic.ArenaPattern ringPattern() { return ringCache.decode(entityData.get(RING_PATTERN), visualArena()); }
     public int castKind() { return entityData.get(CAST); }
     public float castAge(float partial) { return entityData.get(CAST_AT) < 0 ? 1000 : level().getGameTime() - entityData.get(CAST_AT) + partial; }
+    /** Stores final post-armor damage for gradual server-side settlement. */
+    public void queueDamage(float amount) {
+        if (level().isClientSide || shielded() || !isAlive() || Float.isNaN(amount) || amount <= 0) return;
+        float available = EncounterRules.phaseDamageRemaining(getHealth(), getMaxHealth(), phase());
+        if (available <= 0) return;
+        double pending = Double.isFinite(unsettledDamage) && unsettledDamage > 0 ? unsettledDamage : 0;
+        double incoming = Float.isFinite(amount) ? amount : Double.MAX_VALUE / 4;
+        unsettledDamage = Math.min((double) available, Math.min(Double.MAX_VALUE / 4, pending + incoming));
+    }
+    private void settlePendingDamage() {
+        if (!(level() instanceof ServerLevel) || shielded() || !isAlive() || unsettledDamage <= 0) return;
+        float pending = (float)Math.min(unsettledDamage, Float.MAX_VALUE);
+        float applied = EncounterRules.perTickDamage(pending, getMaxHealth());
+        applied = EncounterRules.limitFinalDamage(getHealth(), getMaxHealth(), phase(), applied);
+        if (applied <= 0) { unsettledDamage = 0; return; }
+        float before = getHealth();
+        setHealth(Math.max(0, before - applied));
+        unsettledDamage = Math.max(0, unsettledDamage - applied);
+        if (getHealth() <= 0 && isAlive()) die(damageSources().generic());
+    }
     private void syncArena() {
         if (home == null) return;
         entityData.set(ORIGIN, home);
@@ -181,7 +203,8 @@ public final class ChronicleKeeperEntity extends Monster implements ChronalCaste
                 player.displayClientMessage(Component.translatable("message.time.attack_from_present"), true); return false;
             }
         }
-        // The final cap is applied by TimeCombatEvents after armor reduction.
+        // The lowest-priority damage event queues the post-armor amount; this only
+        // rejects a hit once the current phase boundary has already been reached.
         if (EncounterRules.limitFinalDamage(getHealth(), getMaxHealth(), phase(), amount) <= 0) return false;
         damageDepth++;
         try { return super.hurt(source, amount); } finally { damageDepth--; }
@@ -202,6 +225,8 @@ public final class ChronicleKeeperEntity extends Monster implements ChronalCaste
         if (home == null) { home = blockPosition(); syncArena(); }
         if (controller != null && !hasArenaVisuals()) syncArena();
         if (controller == null) entityData.set(SHIELD, false);
+        settlePendingDamage();
+        if (!isAlive()) return;
         bossBar.setProgress(Math.max(0, Math.min(1, getHealth() / getMaxHealth())));
         if (controller != null && puzzle() == null) {
             if (++emptyTicks >= 200) { cleanupEchoes(); bossBar.removeAllPlayers(); discard(); }
@@ -289,7 +314,7 @@ public final class ChronicleKeeperEntity extends Monster implements ChronalCaste
     }
 
     private void enterPhase(int next) {
-        entityData.set(PHASE, next); phaseTicks = 0; rewindTicks = 0; debts.clear(); recordedPlayers.clear();
+        entityData.set(PHASE, next); phaseTicks = 0; rewindTicks = 0; unsettledDamage = 0; debts.clear(); recordedPlayers.clear();
         cleanupEchoes(); entityData.set(SHIELD, controller != null); clearCombatVisuals();
         anchors.randomize(random.nextLong());
         if (puzzle() != null) puzzle().showAnchors(0, false);
@@ -430,13 +455,14 @@ public final class ChronicleKeeperEntity extends Monster implements ChronalCaste
         if (home != null) tag.putLong("Home", home.asLong());
         tag.putInt("Phase", phase()); tag.putBoolean("Shield", shielded()); tag.putInt("Safe", safeQuadrant());
         tag.putInt("Clock", clock); tag.putInt("PhaseTicks", phaseTicks); tag.putInt("Anchors", anchors.progress());
-        tag.putIntArray("AnchorOrder", anchors.order()); tag.putInt("LastPattern", lastPattern);
+        tag.putIntArray("AnchorOrder", anchors.order()); tag.putInt("LastPattern", lastPattern); tag.putDouble("UnsettledDamage", unsettledDamage);
     }
     @Override public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
         controller = tag.contains("Controller") ? BlockPos.of(tag.getLong("Controller")) : null;
         home = tag.contains("Home") ? BlockPos.of(tag.getLong("Home")) : null;
         entityData.set(PHASE, Math.max(0, Math.min(4, tag.getInt("Phase")))); entityData.set(SHIELD, tag.getBoolean("Shield")); entityData.set(SAFE, Math.floorMod(tag.getInt("Safe"), 4));
+        unsettledDamage = Math.max(0, tag.getDouble("UnsettledDamage"));
         if (!anchors.restore(tag.getIntArray("AnchorOrder"), tag.getInt("Anchors"))) anchors.randomize(random.nextLong());
         if (shielded() && anchors.progress() == 4) anchors.restore(anchors.order(), 0);
         lastPattern = tag.contains("LastPattern") ? Math.floorMod(tag.getInt("LastPattern"), 3) : -1;

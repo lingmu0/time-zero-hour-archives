@@ -5,3 +5,8 @@
 - `config/time-common.toml` 新增并支持热加载：`bossHealth`、`bossDamage`、`echoCount`、`echoHealth`。
 - `echoCount` 控制过去残响每轮生成数量，`echoHealth` 控制残响生命值；默认值分别为 3 和 18。
 - 主版本仍按 NeoForge 1.21.1 构建；Forge 1.20.1 移植位于 `forge-1.20.1` 分支。
+
+## Boss 条与伤害结算
+
+- Boss 条改为原版白灰色；在 80%、60%、35%、15% 的阶段边界绘制细分线。
+- 非 `/kill` 伤害在最低优先级伤害事件中转入待结算队列，每 tick 最多扣除 Boss 最大生命值的 0.1%；剩余待结算伤害低于该上限时一次结清。队列仍受当前阶段生命阈值限制，因此高伤害不会跳过阶段。
