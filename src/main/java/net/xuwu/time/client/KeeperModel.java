@@ -51,7 +51,8 @@ public final class KeeperModel<T extends Mob> extends EntityModel<T> {
         float direction = falseBody ? -1 : 1;
         float energy = shielded ? 1.7f : 1 + phase * .16f;
         root.y += Mth.sin(age * .045f) * .65f;
-        head.yRot += Mth.clamp(headYaw, -35, 35) * Mth.DEG_TO_RAD;
+        // The entity turns the complete rig toward its target. Applying the
+        // renderer's interpolated head yaw a second time makes the head drift.
         head.xRot += Mth.clamp(headPitch, -18, 18) * Mth.DEG_TO_RAD * .5f;
         dial.zRot += age * .008f * energy * direction;
         innerHalo.zRot -= age * .013f * energy * direction;
