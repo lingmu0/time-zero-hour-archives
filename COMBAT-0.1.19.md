@@ -7,6 +7,7 @@
 - 平台生成与消失检查按垂直移动距离同步：默认每 3 tick 检查一次（旧 0.045 速度对应 5 tick），避免 Boss 已经上移而平台层滞后；平台实体仍只在层级窗口变化时生成或消失。
 - 配置项 secondPhaseBoltCount 和 secondPhaseBoltInterval 分别调整每轮数量和上升阶段间隔；停留阶段会在该间隔基础上再快 10 tick。
 - 二阶段使用“拯救的代价”，注册名为 music.chronicle_keeper_ascension；第一阶段 BGM 和零刻唱片不变。
+- 二阶段 BGM 只有在玩家客户端真正进入 time:sanctum 后才启动；白光跨维度转场期间不会提前切换到新曲目。
 - time:ascension_challenge_sigil 右键会跳过第一幕进入二阶段练习战，仍保留白光转场和完整平台/黑潮机制；它不推进研究、不发放遗迹奖励。潜行右键可从圣域返回。
 
 本版只完成构建、逻辑测试和资源静态检查，未启动 Minecraft。BGM 的再分发授权仍需在公开发布前由项目维护者向原作者确认。
