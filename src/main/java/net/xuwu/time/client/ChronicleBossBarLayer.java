@@ -27,7 +27,7 @@ public final class ChronicleBossBarLayer {
     @SubscribeEvent
     public static void capture(CustomizeGuiOverlayEvent.BossEventProgress event) {
         ChronicleKeeperEntity boss = findEncounter(Minecraft.getInstance());
-        if (boss != null && isKeeperBar(event.getBossEvent())) {
+        if (boss != null && !boss.ascended() && isKeeperBar(event.getBossEvent())) {
             keeperBarSeen = true;
             keeperBarX = event.getX();
             keeperBarY = event.getY();
@@ -38,7 +38,7 @@ public final class ChronicleBossBarLayer {
     public static void render(RenderGuiLayerEvent.Post event) {
         if (!VanillaGuiLayers.BOSS_OVERLAY.equals(event.getName()) || !keeperBarSeen) return;
         ChronicleKeeperEntity boss = findEncounter(Minecraft.getInstance());
-        if (boss != null) {
+        if (boss != null && !boss.ascended()) {
             GuiGraphics graphics = event.getGuiGraphics();
             for (int boundary = 0; boundary < 4; boundary++) {
                 int x = keeperBarX + Math.round(BAR_WIDTH * EncounterRules.phaseBoundary(boundary));

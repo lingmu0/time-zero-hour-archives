@@ -13,6 +13,7 @@ import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.SelectMusicEvent;
 import net.xuwu.time.TimeMod;
 import net.xuwu.time.entity.ChronicleKeeperEntity;
+import net.xuwu.time.registry.TimeContent;
 
 /** Client-owned playback follows the formal encounter, not phase changes or false bodies. */
 @EventBusSubscriber(modid = TimeMod.ID, value = Dist.CLIENT)
@@ -27,18 +28,21 @@ public final class BossMusicManager {
         if (mc.level == null || mc.player == null) { clear(); return; }
         if (mc.isPaused()) return;
 
-        boolean fighting = findEncounter(mc) != null
+        ChronicleKeeperEntity encounter = findEncounter(mc);
+        boolean fighting = encounter != null
             && mc.options.getSoundSourceVolume(SoundSource.MUSIC) > 0
             && mc.options.getSoundSourceVolume(SoundSource.MASTER) > 0;
+        boolean ascension = encounter != null && (encounter.ascended() || encounter.transitioning());
         var sounds = mc.getSoundManager();
         // Stream loading is asynchronous. Allow it to start before treating it as lost.
         // This also recovers after sound-device/resource reloads without duplicate loops.
-        if (music != null && (music.isStopped() || --startupGrace <= 0 && !sounds.isActive(music))) {
+        if (music != null && (music.isStopped() || music.isAscension() != ascension
+                || --startupGrace <= 0 && !sounds.isActive(music))) {
             music.stopImmediately(); sounds.stop(music); music = null;
         }
         if (music == null && fighting) {
             mc.getMusicManager().stopPlaying();
-            music = new BossMusicSound(); startupGrace = 40;
+            music = new BossMusicSound(ascension ? TimeContent.ASCENSION_BOSS_MUSIC.get() : TimeContent.BOSS_MUSIC.get(), ascension);
             sounds.play(music);
         }
         if (music != null) music.setFighting(fighting);

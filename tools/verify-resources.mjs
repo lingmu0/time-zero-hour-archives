@@ -10,6 +10,8 @@ walk(res);
 const docs=new Map(all.filter(p=>p.endsWith('.json')||p.endsWith('.mcmeta')).map(p=>[path.relative(res,p).replaceAll('\\','/'),JSON.parse(fs.readFileSync(p,'utf8'))]));
 const content=fs.readFileSync(path.join(root,'src/main/java/net/xuwu/time/registry/TimeContent.java'),'utf8');
 const items=new Set([...content.matchAll(/(?:item|ITEMS\.register|BLOCKS\.register)\("([a-z0-9_]+)"/g)].map(m=>'time:'+m[1]));
+// Server-generated, non-collectible footing intentionally has no BlockItem.
+items.delete('time:sanctum_platform');
 const zh=docs.get('assets/time/lang/zh_cn.json');
 // Non-launch regression checks for the combat prompt/swap patch.
 for (const language of ['zh_cn','en_us']) {

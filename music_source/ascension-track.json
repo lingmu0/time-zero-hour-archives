@@ -1,0 +1,17 @@
+{
+  "title": "拯救的代价 / The Cost of Salvation",
+  "asset": "src/main/resources/assets/time/sounds/music/ascension_battle.ogg",
+  "source_filename": "【免费BGM】拯救的代价【战斗用BGM⧸哥特系BGM】 - 1.【免费BGM】拯救的代价【战斗用BGM⧸哥特系BGM】(Av1902100588,P1).mp3",
+  "source_sha256": "98c56a5ac4ffad295c973daebd64bb93a7e187e64e01f4aa10ee768dea5918fb",
+  "license_status": "unverified-user-supplied",
+  "author": "Not verified",
+  "sha256": "59827832413b20e59a691c816d12e32b72f7bad2234f11dab860d47df6a84ab5",
+  "sample_rate": 44100,
+  "channels": 2,
+  "frames": 6115328,
+  "duration_seconds": 138.66956916099772,
+  "source_peak_dbfs": -0.7516823856028,
+  "gain_db": -2.7483176143971995,
+  "edge_fade_seconds": 0.01,
+  "processing": "Complete track; gain reduction; 10 ms edge fades; Ogg Vorbis encoding."
+}

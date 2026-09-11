@@ -10,6 +10,7 @@ public final class StateTests {
     }
     public static void main(String[] args) {
         EncounterPatternTests.run();
+        AscensionRuleTests.run();
         var state = new PuzzleState();
         int[] day = {0,1,2,3};
         check(state.press(0, day, 100) == PuzzleState.Result.PROGRESS, "first observation");

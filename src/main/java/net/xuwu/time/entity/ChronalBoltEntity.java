@@ -14,6 +14,15 @@ import net.xuwu.time.registry.TimeContent;
 
 public final class ChronalBoltEntity extends Projectile {
     public static final double SPEED = 1.05;
+    public static void fireFrom(LivingEntity owner, Vec3 origin, Vec3 target, float damage, double speed) {
+        if (owner.level().isClientSide) return;
+        var bolt = TimeContent.CHRONAL_BOLT.get().create(owner.level());
+        if (bolt == null) return;
+        bolt.setOwner(owner); bolt.damage = damage;
+        bolt.setPos(origin.x, origin.y, origin.z);
+        bolt.setDeltaMovement(target.subtract(origin).normalize().scale(speed));
+        owner.level().addFreshEntity(bolt);
+    }
     private int life = 100;
     private float damage = 6;
     public ChronalBoltEntity(EntityType<? extends ChronalBoltEntity> type, Level level) { super(type, level); }

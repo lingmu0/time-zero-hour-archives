@@ -295,6 +295,10 @@ public final class PuzzleControllerBlockEntity extends BlockEntity {
         if (be.state.solved()) be.openGates();
         if (be.encounter != null) {
             Entity entity = server.getEntity(be.encounter);
+            if (entity == null) for (ServerLevel other : server.getServer().getAllLevels()) {
+                Entity candidate = other.getEntity(be.encounter);
+                if (candidate instanceof ChronicleKeeperEntity && candidate.isAlive()) { entity = candidate; break; }
+            }
             if (entity == null) {
                 // Wait for adjacent entity chunks to load before considering a missing boss abandoned.
                 if (!be.players().isEmpty() && ++be.missingTicks >= 10) be.abandonEncounter(be.encounter);

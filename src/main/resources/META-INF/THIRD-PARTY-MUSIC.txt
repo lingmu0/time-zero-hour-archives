@@ -18,3 +18,15 @@ Title: The Zero-Hour Reckoning / 零点钟决
 Original project-generated synthesizer composition from release 0.1.6.
 Preserved unchanged as a jukebox disc.
 No third-party samples or music; follows the project's distribution license.
+
+Asset: assets/time/sounds/music/ascension_battle.ogg
+Title from user-supplied filename: 拯救的代价 / The Cost of Salvation
+Source: MP3 supplied locally by the user.
+License status: unverified-user-supplied
+The filename's "free BGM" label does not establish redistribution permission.
+This local build includes the supplied music at the user's request.
+Before public distribution, verify the original author's usage terms,
+including mod/game embedding, redistribution and any required attribution.
+No CC0 or project-owned license is claimed for this track.
+Changes: complete composition retained, gain reduced to leave headroom,
+10 ms anti-click edge fades, converted from MP3 to stereo Ogg Vorbis.

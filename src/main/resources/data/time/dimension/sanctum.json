@@ -1,0 +1,11 @@
+{
+  "type": "time:sanctum",
+  "generator": {
+    "type": "minecraft:flat",
+    "settings": {
+      "biome": "minecraft:the_void",
+      "layers": [{"height": 1, "block": "minecraft:air"}],
+      "lakes": false, "features": false, "structure_overrides": []
+    }
+  }
+}

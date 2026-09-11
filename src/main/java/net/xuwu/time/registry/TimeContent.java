@@ -30,6 +30,8 @@ public final class TimeContent {
     public static final DeferredRegister<SoundEvent> SOUNDS = DeferredRegister.create(Registries.SOUND_EVENT, TimeMod.ID);
     public static final DeferredHolder<SoundEvent, SoundEvent> BOSS_MUSIC = SOUNDS.register("music.chronicle_keeper",
         () -> SoundEvent.createVariableRangeEvent(TimeMod.id("music.chronicle_keeper")));
+    public static final DeferredHolder<SoundEvent, SoundEvent> ASCENSION_BOSS_MUSIC = SOUNDS.register("music.chronicle_keeper_ascension",
+        () -> SoundEvent.createVariableRangeEvent(TimeMod.id("music.chronicle_keeper_ascension")));
     public static final DeferredHolder<SoundEvent, SoundEvent> ZERO_HOUR_MUSIC = SOUNDS.register("music_disc.zero_hour",
         () -> SoundEvent.createVariableRangeEvent(TimeMod.id("music_disc.zero_hour")));
     public static final ResourceKey<JukeboxSong> ZERO_HOUR_SONG =
@@ -52,6 +54,8 @@ public final class TimeContent {
     }
     public static final DeferredBlock<Block> CHRONAL_STONE = BLOCKS.register("chronal_stone",
         () -> new Block(mechanism()));
+    public static final DeferredBlock<SanctumPlatformBlock> SANCTUM_PLATFORM = BLOCKS.register("sanctum_platform",
+        () -> new SanctumPlatformBlock(mechanism().sound(SoundType.GLASS).dynamicShape().noOcclusion().lightLevel(s -> 12)));
     public static final DeferredBlock<Block> TEMPORAL_BARRIER = BLOCKS.register("temporal_barrier",
         () -> new Block(mechanism().lightLevel(s -> 8)));
     public static final DeferredBlock<PuzzleControllerBlock> CONTROLLER = BLOCKS.register("puzzle_controller",
@@ -81,6 +85,8 @@ public final class TimeContent {
     public static final DeferredItem<Item> TEMPORAL_DUST = item("temporal_dust");
     public static final DeferredItem<ChallengeSigilItem> CHALLENGE_SIGIL=ITEMS.register("challenge_sigil",
         ()->new ChallengeSigilItem(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC).fireResistant()));
+    public static final DeferredItem<AscensionChallengeItem> ASCENSION_CHALLENGE_SIGIL=ITEMS.register("ascension_challenge_sigil",
+        ()->new AscensionChallengeItem(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC).fireResistant()));
     public static final DeferredItem<Item> MUSIC_DISC_ZERO_HOUR = ITEMS.register("music_disc_zero_hour",
         () -> new Item(new Item.Properties().stacksTo(1).rarity(Rarity.RARE).jukeboxPlayable(ZERO_HOUR_SONG)));
     public static final DeferredItem<Item> PAST_RECORD = item("past_record");

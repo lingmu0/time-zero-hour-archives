@@ -19,9 +19,10 @@ public final class KeeperRenderer extends MobRenderer<ChronicleKeeperEntity, Kee
     @Override public void render(ChronicleKeeperEntity boss, float yaw, float partial, PoseStack pose, MultiBufferSource buffers, int light) {
         super.render(boss, yaw, partial, pose, buffers, light);
         KeeperTelegraph.render(boss, partial, pose, buffers);
+        SanctumScene.render(boss, partial, pose, buffers);
     }
     @Override public boolean shouldRender(ChronicleKeeperEntity boss, Frustum frustum, double x, double y, double z) {
-        return super.shouldRender(boss, frustum, x, y, z) || KeeperTelegraph.visible(boss) && frustum.isVisible(boss.visualArena());
+        return boss.ascended() || super.shouldRender(boss, frustum, x, y, z) || KeeperTelegraph.visible(boss) && frustum.isVisible(boss.visualArena());
     }
     @Override public ResourceLocation getTextureLocation(ChronicleKeeperEntity entity) { return TEXTURE; }
 }

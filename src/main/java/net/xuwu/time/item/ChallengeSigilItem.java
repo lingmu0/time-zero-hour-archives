@@ -23,6 +23,10 @@ public final class ChallengeSigilItem extends Item {
         if(!(user instanceof ServerPlayer player))return InteractionResultHolder.sidedSuccess(stack,true);
         if(player.isPassenger()||player.isSpectator())return fail(player,stack,"challenge_unavailable");
         player.getCooldowns().addCooldown(this,40);
+        if (level.dimension().equals(net.xuwu.time.entity.AscensionFight.DIMENSION)) {
+            if (player.isShiftKeyDown() && net.xuwu.time.entity.AscensionFight.returnPlayer(player)) return InteractionResultHolder.success(stack);
+            return fail(player,stack,"challenge_unavailable");
+        }
         if(player.isShiftKeyDown())return leave(player,stack);
         ServerLevel arena=player.server.getLevel(ChallengeArena.DIMENSION);
         if(arena==null)return fail(player,stack,"challenge_missing");
