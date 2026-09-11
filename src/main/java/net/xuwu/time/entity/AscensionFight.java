@@ -68,18 +68,23 @@ public final class AscensionFight {
             return;
         }
         emptyTicks = 0;
+        double ascentSpeed = TimeConfig.SECOND_PHASE_TIDE_SPEED.get();
+        if (!Double.isFinite(ascentSpeed) || ascentSpeed <= 0) ascentSpeed = AscensionRules.RISE_PER_TICK;
         boolean moving = AscensionRules.climbing(ticks++);
         if (moving) {
-            rise += AscensionRules.RISE_PER_TICK;
-            tideRise += TimeConfig.SECOND_PHASE_TIDE_SPEED.get();
+            // One live speed drives all three moving parts of the arena.
+            rise += ascentSpeed;
+            tideRise += ascentSpeed;
         }
         if (64 + rise - shift > 1500) rebase(level, players);
-        if (moving && ticks % 5 == 0 || platforms.isEmpty()) reconcilePlatforms(level);
+        int platformSyncInterval = AscensionRules.platformSyncInterval(ascentSpeed);
+        if ((moving && ticks % platformSyncInterval == 0) || platforms.isEmpty()) reconcilePlatforms(level);
         double y = 72 + rise - shift;
         // Descend to a reachable firing height during rests; no endless upward drift then.
         double angle = rise * .07;
         Vec3 goal = new Vec3(siteX + Math.cos(angle) * 3, y, siteZ + Math.sin(angle) * 3);
-        boss.setDeltaMovement(goal.subtract(boss.position()).scale(.13));
+        double tracking = Math.max(.13, Math.min(.25, .13 + ascentSpeed * 1.2));
+        boss.setDeltaMovement(goal.subtract(boss.position()).scale(tracking));
         if (!moving && boss.position().distanceToSqr(goal) < .0025) boss.setDeltaMovement(Vec3.ZERO);
         ServerPlayer target = players.get(Math.floorMod(ticks / 100, players.size()));
         boss.faceAscensionTarget(target);

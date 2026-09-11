@@ -3,10 +3,23 @@ package net.xuwu.time.logic;
 /** Deterministic geometry and timing for the endless second act. No movement buffs. */
 public final class AscensionRules {
     public static final int ARRIVAL_TICKS = 100, CLIMB_TICKS = 180, REST_TICKS = 100;
-    public static final double RISE_PER_TICK = .045;
-    /** Default tide speed; the live value is configurable in TimeConfig. */
-    public static final double TIDE_RISE_PER_TICK = .075;
+    /** Shared default upward speed for the Boss, platform tiers and black tide. */
+    public static final double RISE_PER_TICK = .075;
+    /** Kept as a named assertion/default for callers that describe the tide separately. */
+    public static final double TIDE_RISE_PER_TICK = RISE_PER_TICK;
+    private static final double PLATFORM_SYNC_DISTANCE = .225;
     public static final int BOLT_INTERVAL_TICKS = 40, REST_BOLT_INTERVAL_TICKS = 30;
+
+    /**
+     * Keeps platform creation/removal checks proportional to vertical travel.
+     * The old .045 speed checked every five ticks, so the same distance at .075
+     * is checked every three ticks.
+     */
+    public static int platformSyncInterval(double speed) {
+        double safeSpeed = Double.isFinite(speed) ? Math.max(.01, speed) : RISE_PER_TICK;
+        return Math.max(1, (int)Math.ceil(PLATFORM_SYNC_DISTANCE / safeSpeed));
+    }
+
     public static boolean climbing(int tick) {
         return tick >= ARRIVAL_TICKS && (tick - ARRIVAL_TICKS) % (CLIMB_TICKS + REST_TICKS) < CLIMB_TICKS;
     }

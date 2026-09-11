@@ -22,7 +22,7 @@ public final class TimeConfig {
         BOSS_DAMAGE = b.comment("Chronicle Keeper attack damage before armor and pack scaling.").defineInRange("bossDamage", 10.0, 1, 1000);
         SECOND_PHASE_BOLT_COUNT = b.comment("Base chronal bolt count per second-act volley; two extra bolts are added below half health.").defineInRange("secondPhaseBoltCount", 4, 1, 12);
         SECOND_PHASE_BOLT_INTERVAL = b.comment("Moving-state second-act bolt interval in ticks; the rest interval is ten ticks faster.").defineInRange("secondPhaseBoltInterval", 40, 20, 200);
-        SECOND_PHASE_TIDE_SPEED = b.comment("Black-tide rise per moving tick; the tide pauses during rests.").defineInRange("secondPhaseTideSpeed", .075, .01, 1.0);
+        SECOND_PHASE_TIDE_SPEED = b.comment("Shared second-act upward speed for the Boss target, platform tiers and black tide; all pause during rests.").defineInRange("secondPhaseTideSpeed", .075, .01, 1.0);
         ECHO_COUNT = b.comment("Number of past memory echoes spawned per rewind.").defineInRange("echoCount", 3, 1, 12);
         ECHO_HEALTH = b.comment("Health assigned to every temporal echo.").defineInRange("echoHealth", 18.0, 1, 1000);
         RETRY_DELAY = b.comment("Seconds after a wipe before a free retry.").defineInRange("retryDelaySeconds", 15, 1, 300);

@@ -43,8 +43,11 @@ public final class AscensionRuleTests {
         check(EncounterRules.perTickDamage(10000,500)==.5f,"second act damage rate");
         check(EncounterRules.perTickDamage(.2f,500)==.2f,"settle final sub-tick remainder");
         check(EncounterRules.limitFinalDamage(1,500,4,10000)==1,"second act may reach actual death");
-        check(AscensionRules.TIDE_RISE_PER_TICK > AscensionRules.RISE_PER_TICK,"tide rises faster than the Boss");
-        System.out.println("PASS: "+checks+" ascension geometry, rest timing, height recycling, flash and damage-rate assertions.");
+        check(Math.abs(AscensionRules.TIDE_RISE_PER_TICK - AscensionRules.RISE_PER_TICK) < 1e-8,
+            "Boss, platforms and tide share the ascent speed");
+        check(AscensionRules.platformSyncInterval(.045) == 5,"legacy platform sync distance");
+        check(AscensionRules.platformSyncInterval(.075) == 3,"accelerated platform sync distance");
+        System.out.println("PASS: "+checks+" ascension geometry, synchronized ascent, rest timing, height recycling, flash and damage-rate assertions.");
     }
     private AscensionRuleTests() {}
 }
