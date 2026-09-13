@@ -68,9 +68,26 @@ for(const [filename,doc] of docs){
     for(const value of doc.structures)exists('data/time/worldgen/structure/'+value.structure.slice(5)+'.json');
   }
   if(filename.startsWith('data/time/worldgen/structure/')){
-    assert(doc.type==='time:time_ruin'&&doc.variant>=0&&doc.variant<=2,'Invalid custom structure');
-    exists('data/time/tags/worldgen/biome/'+doc.biomes.slice('#time:'.length)+'.json');
-    assert(['surface_structures','underground_structures'].includes(doc.step),'Invalid generation stage');
+    if(doc.type==='time:time_ruin'){
+      assert(doc.variant>=0&&doc.variant<=2,'Invalid custom structure variant');
+      exists('data/time/tags/worldgen/biome/'+doc.biomes.slice('#time:'.length)+'.json');
+      assert(['surface_structures','underground_structures'].includes(doc.step),'Invalid generation stage');
+    } else if(doc.type==='minecraft:jigsaw'){
+      assert.equal(doc.start_pool,'time:time_temple','Time Temple must use its single rigid template pool');
+      assert.equal(doc.size,1,'Time Temple must not recursively expand its large template');
+      assert.deepEqual(doc.start_height,{absolute:96},'Time Temple must start above the ocean');
+      assert.equal(doc.max_distance_from_center,128,'Time Temple center range changed unexpectedly');
+      assert.deepEqual(doc.spawn_overrides,{},'Time Temple must declare empty spawn overrides');
+      exists('data/time/worldgen/template_pool/time_temple.json');
+      exists('data/time/tags/worldgen/biome/'+doc.biomes.slice('#time:'.length)+'.json');
+      assert.equal(doc.step,'surface_structures','Time Temple must generate as a surface structure');
+    } else throw new Error('Unknown structure type: '+doc.type);
+  }
+  if(filename==='data/time/worldgen/template_pool/time_temple.json'){
+    assert.equal(doc.elements?.length,1,'Time Temple pool must contain one template');
+    const location=doc.elements[0]?.element?.location;
+    assert.equal(location,'time:time_temple','Time Temple pool location changed');
+    exists('data/time/structures/time_temple.nbt');
   }
   if(filename.startsWith('data/time/tags/item/')){
     for(const value of doc.values){
