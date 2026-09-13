@@ -7,7 +7,8 @@
 - 1.21.1 新增第二幕“无尽升华”：白光转场进入白金圣域、透明玻璃平台无限向上、间歇追逐、多方向飞弹与上升黑潮。第二幕默认 500 血，独立配置，保留逐 tick 扣血，不提供专属跳跃增幅。详见 [0.1.19 机制与验证范围](COMBAT-0.1.19.md)。
 - 二阶段进入 time:sanctum 后才播放独立的战斗音乐“拯救的代价”，白光转场期间不提前切换；第一阶段音乐和唱片保持不变。其来源和当前未核验的再分发授权记录在 src/main/resources/META-INF/THIRD-PARTY-MUSIC.txt。
 
-- 三座可自然生成、可定位、可用原版命令放置的遗迹：残刻观测台、逆时档案馆、零点钟室。地下遗迹自带地表入口、照明竖井和梯子。
+- 四座可自然生成、可定位、可用原版命令放置的遗迹：残刻观测台、逆时档案馆、零点钟室，以及主世界海洋上空的时间神殿。地下遗迹自带地表入口、照明竖井和梯子。
+ 时间神殿使用大型单模板跨区块生成：建筑尺寸 219×202×76，固定生成在海面上方，显式空气已在打包前清理，避免巨量空方块导致结构处理缓慢或分区块不完整。生成间距为 256 区块、分离值为 192，仅允许主世界九种海洋生物群系。
 - 九类持久化房间：四相顺序、四钟校准、样本解封、因果排序、镜像路线、延迟钟声、精英守卫、三相印记、最终 Boss。
 - 独立实体：终末编年者、失序抄写员、时间回声，以及无地形破坏的时序飞弹。
 - 编年者五阶段：四锚校准 → 过去残响 → 安全相位 → 未来债务 → 真假编年者。开场及每次转阶段均需破解随机四相护盾；最终破盾后召唤假身。Boss 条使用原版白灰色样式，并在 80% / 60% / 35% / 15% 阶段边界绘制分隔线；非 `/kill` 伤害在最低优先级事件中排队，每 tick 最多结算最大生命值的千分之一，不能用高伤害跳过阶段。
@@ -39,7 +40,7 @@ $env:Path="$env:JAVA_HOME\bin;$env:Path"
 node tools/verify-resources.mjs
 ```
 
-常规构建仅需 Java 21；Node.js 18+ 用于可选模型导出与资源验证工具。已生成的 Java 模型和材质随项目提供。当前本地产物在 `build/libs/time-0.1.19-1.21.1.jar`。客户端和服务端都需要安装。
+常规构建仅需 Java 21；Node.js 18+ 用于可选模型导出与资源验证工具。已生成的 Java 模型和材质随项目提供。当前本地产物在 `build/libs/time-0.1.21-1.21.1.jar`。客户端和服务端都需要安装。
 
 `build` 包含无需启动游戏的状态断言；0.1.18 已执行 397939 项原有场地/护盾断言、205862 项升华几何/时序断言及 41 项基础流程断言。另提供真实服务端 GameTest 和客户端检查工具；本次只编译 GameTest，不启动游戏。历史 0.1.2 运行记录见 [VALIDATION.md](VALIDATION.md)，不能视为新版本实测结果。
 
@@ -100,6 +101,8 @@ node tools/blockbench-status.mjs
 
 0.1.17 将现在阶段安全区改为逆时针轮换（西北 → 西南 → 东南 → 东北），未来债务提示改为方位加相位；新增 Boss 血量、Boss 伤害、残响数量和残响血量配置。同步提供 Forge 1.20.1 移植分支 `forge-1.20.1`。
 
+0.1.21 加入主世界海洋上空的时间神殿。使用 219×202×76 的单一刚性模板，由原版 jigsaw 结构系统跨区块放置；Forge 1.20.1 使用 `data/time/structures/`，NeoForge 1.21.1 使用 `data/time/structure/`。为兼容 1.20.1，结构定义显式声明空的 `spawn_overrides`。
+
 ## 开发命令
 
 需要管理员权限；原版的 `/time` 命令保持原样。
@@ -109,15 +112,18 @@ node tools/blockbench-status.mjs
 /locate structure time:observatory
 /locate structure time:archive
 /locate structure time:clockroom
+/locate structure time:time_temple
 /place structure time:observatory
 /place structure time:archive
 /place structure time:clockroom
+/place structure time:time_temple
 /timearchive status <控制器X> <控制器Y> <控制器Z>
 ```
 
 放置遗迹会按指定位置生成方块，应在空白测试区域使用。正式 Boss 流程由遗迹核心启动；刷怪蛋/直接召唤可用于查看实体，不能代表完整遗迹流程。
 
 新自然遗迹只出现在尚未生成的区块。用主世界陆地生物群系寻找，探针搜索半径在配置中可调。
+时间神殿只会在尚未生成的主世界海洋区块中自然出现，建筑底部位于 Y=96，顶部不会超过主世界高度上限。使用 `/place structure time:time_temple` 可在空白区域验证完整模板放置；自然生成时由原版结构系统按结构 Piece 跨区块裁剪，不要求一次性加载整座建筑。
 
 ## 模组配置
 

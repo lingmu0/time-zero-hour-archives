@@ -1,0 +1,14 @@
+{
+  "structures": [
+    {
+      "structure": "time:time_temple",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 256,
+    "separation": 192,
+    "salt": 47291637
+  }
+}
